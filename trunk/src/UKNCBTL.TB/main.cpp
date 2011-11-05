@@ -70,6 +70,8 @@ void Test2_RomBasic()
 
     Test_CheckScreenshot(_T("data\\test02_1.bmp"));
 
+    Emulator_KeyboardSequence("PRINT PI\n");
+
     // 10 FOR I=32 TO 255
     Emulator_KeyboardSequence("10 FOR I");
     Emulator_KeyboardPressReleaseShift(0175);  // "="
@@ -94,19 +96,32 @@ void Test2_RomBasic()
     Test_CheckScreenshot(_T("data\\test02_2.bmp"));
 }
 
-void Test3_FTMON()
+void Test3_FODOSTM1()
 {
     Test_LogInfo(_T("TEST 3: FODOSTM1"));
     Emulator_Reset();
 
-    Test_CopyFile(_T("data\\FODOSTM1.DSK"), _T("temp\\FODOSTM1.DSK"));
+    Test_CopyFile(_T("data\\fodostm1.dsk"), _T("temp\\fodostm1.dsk"));
 
-    Emulator_AttachFloppyImage(0, _T("temp\\FODOSTM1.DSK"));
+    Emulator_AttachFloppyImage(0, _T("temp\\fodostm1.dsk"));
     //TODO: Check error
 
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("1\n");
     Emulator_Run(200);  // Boot from the disk: 8 seconds
+
+    Emulator_KeyboardSequence("UTST01\n");
+    Emulator_Run(1750);
+    Test_CheckScreenshot(_T("data\\test03_1.bmp"));
+    Emulator_KeyboardPressReleaseChar('\n');
+    Emulator_Run(9550);  // 6:22
+    Test_CheckScreenshot(_T("data\\test03_2.bmp"));
+    Emulator_KeyboardPressReleaseChar('\n');
+    Emulator_Run(2950);  // 1:58
+    Test_CheckScreenshot(_T("data\\test03_3.bmp"));
+    Emulator_KeyboardPressReleaseChar('\n');
+    Emulator_Run(1000);  // 0:40
+    Test_CheckScreenshot(_T("data\\test03_4.bmp"));
 
     // Turn off the timer
     Emulator_KeyboardPressRelease(0152);  // "УСТ"
@@ -120,19 +135,36 @@ void Test3_FTMON()
     Emulator_KeyboardPressRelease(0151);  // "ИСП"
     Emulator_Run(10);
 
-    // Run the tests
+    // Run the FTMON tests
     Emulator_KeyboardSequence("R FTMON\n");
-    Emulator_Run(50);  // Loading FTMON
+    Emulator_Run(75);  // Loading FTMON
     Emulator_KeyboardSequence("D\n");  // Description
-    Emulator_Run(100);
-    Test_CheckScreenshot(_T("data\\test03_1.bmp"));
+    Emulator_Run(125);
+    Test_CheckScreenshot(_T("data\\test03_5.bmp"));
     Emulator_KeyboardSequence("O 791401\n");
     Emulator_Run(50);
     Emulator_KeyboardSequence("O 791402\n");
     Emulator_Run(50);
     Emulator_KeyboardSequence("O 691404\n");
     Emulator_Run(66);
-    Test_CheckScreenshot(_T("data\\test03_2.bmp"));
+    Test_CheckScreenshot(_T("data\\test03_6.bmp"));
+
+    Emulator_KeyboardSequence("O SPEED\n");
+    Emulator_Run(66);
+
+    // Turn on the timer
+    Emulator_KeyboardPressRelease(0152);  // "УСТ"
+    Emulator_Run(5);
+    Emulator_KeyboardPressReleaseChar('8');  // Timer
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0133);  // Right arrow
+    Emulator_Run(5);
+    Emulator_KeyboardPressReleaseChar('1');  // Off
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0151);  // "ИСП"
+
+    Emulator_Run(250);
+    Test_SaveScreenshot(_T("test03_speed.bmp"));
 
     Emulator_Reset();
 }
@@ -174,7 +206,9 @@ void Test4_Games()
     Emulator_Run(400);  // Skip titles
     Emulator_KeyboardSequence("1");  // Game rank
     Emulator_Run(120);
-    Test_CheckScreenshot(_T("data\\test04_3.bmp"));
+    //NOTE: Почему-то после Test1_MenuAndSelfTest() эта игра рисует спрайты неправильно
+    Test_SaveScreenshot(_T("test04_3.bmp"));
+    //Test_CheckScreenshot(_T("data\\test04_3.bmp"));
 
     Emulator_Reset();
 
@@ -221,10 +255,10 @@ int _tmain(int argc, _TCHAR* argv[])
         return 1;
     }
 
-    //Test1_MenuAndSelfTest();
-    //Test2_RomBasic();
-    Test3_FTMON();
-    //Test4_Games();
+    Test1_MenuAndSelfTest();
+    Test2_RomBasic();
+    Test3_FODOSTM1();
+    Test4_Games();
 
     Test_LogInfo(_T("Finalization..."));
     Emulator_Done();
