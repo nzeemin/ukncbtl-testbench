@@ -67,10 +67,13 @@ void Test_LogFormat(char eventtype, LPCTSTR format, ...);
 inline void Test_LogInfo(LPCTSTR message) { Test_Log('i', message); }
 inline void Test_LogError(LPCTSTR message) { Test_Log('E', message); }
 
+void Test_AttachFloppyImage(int slot, LPCTSTR sFilePath);
+
 void Test_SaveScreenshot(LPCTSTR sFileName);
 void Test_CheckScreenshot(LPCTSTR sFileName);
 
 void Test_CopyFile(LPCTSTR sFileNameFrom, LPCTSTR sFileNameTo);
+void Test_CreateDiskImage(LPCTSTR sFileName, int tracks);
 
 
 //////////////////////////////////////////////////////////////////////
