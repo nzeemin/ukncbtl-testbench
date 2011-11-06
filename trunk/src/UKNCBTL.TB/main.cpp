@@ -165,6 +165,15 @@ void Test3_FODOSTM1()
     Test_SaveScreenshot(_T("test03_speed.bmp"));
 
     Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot from the disk: 8 seconds
+    Emulator_KeyboardSequence("IOSCAN\n");  // Run I/O port scanner
+    Emulator_Run(50);
+    Test_SaveScreenshot(_T("test03_ioscan.bmp"));
+
+    Emulator_Reset();
 }
 
 void Test4_Games()
