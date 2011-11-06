@@ -281,6 +281,27 @@ void Test5_Disks()
     Emulator_Reset();
 }
 
+void Test6_TurboBasic()
+{
+    Test_LogInfo(_T("TEST 6: Turbo Basic"));
+    Emulator_Reset();
+
+    Test_CopyFile(_T("data\\turbo.dsk"), _T("temp\\turbo.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\turbo.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(125);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("\n");  // Date
+    Emulator_Run(75);  // Boot: 3 seconds
+
+    Emulator_KeyboardSequence("TURBO\n");
+    Emulator_Run(500);
+    Test_CheckScreenshot(_T("data\\test06_1.bmp"));
+
+    Emulator_Reset();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     Test_LogInfo(_T("Initialization..."));
@@ -296,6 +317,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test3_FODOSTM1();
     Test4_Games();
     Test5_Disks();
+    Test6_TurboBasic();
 
     Test_LogInfo(_T("Finalization..."));
     Emulator_Done();
