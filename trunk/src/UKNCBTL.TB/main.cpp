@@ -102,9 +102,7 @@ void Test3_FODOSTM1()
     Emulator_Reset();
 
     Test_CopyFile(_T("data\\fodostm1.dsk"), _T("temp\\fodostm1.dsk"));
-
-    Emulator_AttachFloppyImage(0, _T("temp\\fodostm1.dsk"));
-    //TODO: Check error
+    Test_AttachFloppyImage(0, _T("temp\\fodostm1.dsk"));
 
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("1\n");
@@ -177,10 +175,8 @@ void Test4_Games()
     Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
     Test_CopyFile(_T("data\\game.dsk"), _T("temp\\game.dsk"));
 
-    Emulator_AttachFloppyImage(0, _T("temp\\disk1.DSK"));
-    //TODO: Check error
-    Emulator_AttachFloppyImage(1, _T("temp\\game.DSK"));
-    //TODO: Check error
+    Test_AttachFloppyImage(0, _T("temp\\disk1.DSK"));
+    Test_AttachFloppyImage(1, _T("temp\\game.DSK"));
 
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("1\n");
@@ -245,6 +241,46 @@ void Test4_Games()
     Emulator_Reset();
 }
 
+void Test5_Disks()
+{
+    Test_LogInfo(_T("TEST 5: Disks"));
+    Emulator_Reset();
+
+    Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
+    Test_CreateDiskImage(_T("temp\\tempdisk.dsk"), 40);
+    Test_AttachFloppyImage(0, _T("temp\\disk1.dsk"));
+    Test_AttachFloppyImage(1, _T("temp\\tempdisk.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
+    Emulator_Run(75);  // Boot: 3 seconds
+
+    // Initialize MZ1: disk
+    Emulator_KeyboardSequence("INIT MZ1:\n");
+    Emulator_Run(50);
+    Emulator_KeyboardSequence("Y\n");  // Are you sure?
+    Emulator_Run(50);
+    Emulator_KeyboardSequence("DIR MZ1:\n");
+    Emulator_Run(250);
+    Test_CheckScreenshot(_T("data\\test05_1.bmp"));
+
+    Emulator_KeyboardSequence("COPY /DEVICE MZ0: MZ1:\n");
+    Emulator_Run(50);
+    Emulator_KeyboardSequence("Y\n");  // Are you sure?
+    Emulator_Run(1750);
+    Emulator_KeyboardSequence("DIR /SUM MZ1:\n");
+    Emulator_Run(150);
+    Emulator_KeyboardSequence("BOOT MZ1:\n");
+    Emulator_Run(250);
+    Emulator_KeyboardPressReleaseChar('\n');
+    Emulator_Run(75);
+    Test_CheckScreenshot(_T("data\\test05_2.bmp"));
+
+    Emulator_Reset();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     Test_LogInfo(_T("Initialization..."));
@@ -259,6 +295,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test2_RomBasic();
     Test3_FODOSTM1();
     Test4_Games();
+    Test5_Disks();
 
     Test_LogInfo(_T("Finalization..."));
     Emulator_Done();

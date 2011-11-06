@@ -120,12 +120,18 @@ void PrintBinaryValue(TCHAR* buffer, WORD value)
 
 void Test_Log(char eventtype, LPCTSTR message)
 {
+    HANDLE hStdOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
+    WORD fgcolor = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
+    if (eventtype == 'E')
+        fgcolor = FOREGROUND_RED|FOREGROUND_INTENSITY;
     //TODO: Show UKNC uptime
     SYSTEMTIME stm;
     ::GetLocalTime(&stm);
+    ::SetConsoleTextAttribute(hStdOut, fgcolor);
     printf("%02d:%02d:%02d.%03d %c %S\n",
         stm.wHour, stm.wMinute, stm.wSecond, stm.wMilliseconds,
         eventtype, message);
+    ::SetConsoleTextAttribute(hStdOut, FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
 }
 
 void Test_LogFormat(char eventtype, LPCTSTR format, ...)
@@ -138,6 +144,13 @@ void Test_LogFormat(char eventtype, LPCTSTR format, ...)
     va_end(ptr);
 
     Test_Log(eventtype, buffer);
+}
+
+void Test_AttachFloppyImage(int slot, LPCTSTR sFilePath)
+{
+    BOOL res = Emulator_AttachFloppyImage(slot, sFilePath);
+    if (!res)
+        Test_LogFormat('E', _T("FAILED to attach floppy image %s"), sFilePath);
 }
 
 void Test_SaveScreenshot(LPCTSTR sFileName)
@@ -162,7 +175,7 @@ void Test_CheckScreenshot(LPCTSTR sFileName)
         exit(1);
     }
 
-    Test_LogFormat('E', _T("TEST FAILED checking screenshot %s, difference %d"), sFileName, diff);
+    Test_LogFormat('E', _T("TEST FAILED checking screenshot %s, diff %d"), sFileName, diff);
 }
 
 void Test_CopyFile(LPCTSTR sFileNameFrom, LPCTSTR sFileNameTo)
@@ -174,6 +187,23 @@ void Test_CopyFile(LPCTSTR sFileNameFrom, LPCTSTR sFileNameTo)
     }
 
     Test_LogFormat('i', _T("Copyed file %s to %s"), sFileNameFrom, sFileNameTo);
+}
+
+void Test_CreateDiskImage(LPCTSTR sFileName, int tracks)
+{
+    LONG fileSize = tracks * 10240;
+	HANDLE hFile = ::CreateFile(sFileName,
+		GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
+    {
+        Test_LogFormat('E', _T("FAILED to create disk image %s"), sFileName);
+        return;
+    }
+
+    // Zero-fill the file
+    ::SetFilePointer(hFile, fileSize, NULL, FILE_BEGIN);
+    ::SetEndOfFile(hFile);
+    ::CloseHandle(hFile);
 }
 
 
