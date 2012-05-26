@@ -275,6 +275,15 @@ void Test5_Disks()
     Emulator_Run(250);
     Test_CheckScreenshot(_T("data\\test05_1.bmp"));
 
+    //DebugLogClear();
+    //DebugLog(_T("Command COPY MZ0:PIP.SAV MZ1:\n"));
+    Emulator_KeyboardSequence("COPY MZ0:PIP.SAV MZ1:\n");
+    Emulator_Run(1800);
+    //DebugLog(_T("Command DIR MZ1:\n"));
+    Emulator_KeyboardSequence("DIR MZ1:\n");
+    Emulator_Run(750);
+    Test_CheckScreenshot(_T("data\\test05_2.bmp"));
+
     Emulator_KeyboardSequence("COPY /DEVICE MZ0: MZ1:\n");
     Emulator_Run(50);
     Emulator_KeyboardSequence("Y\n");  // Are you sure?
@@ -285,7 +294,7 @@ void Test5_Disks()
     Emulator_Run(250);
     Emulator_KeyboardPressReleaseChar('\n');
     Emulator_Run(75);
-    Test_CheckScreenshot(_T("data\\test05_2.bmp"));
+    Test_CheckScreenshot(_T("data\\test05_3.bmp"));
 
     Emulator_Reset();
 }
