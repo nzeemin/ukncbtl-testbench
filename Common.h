@@ -70,6 +70,9 @@ inline void Test_LogError(LPCTSTR message) { Test_Log('E', message); }
 
 void Test_AttachFloppyImage(int slot, LPCTSTR sFilePath);
 
+void Test_OpenTape(LPCTSTR sFilePath);
+void Test_CloseTape();
+
 void Test_SaveScreenshot(LPCTSTR sFileName);
 void Test_CheckScreenshot(LPCTSTR sFileName);
 

@@ -320,6 +320,26 @@ void Test6_TurboBasic()
     Emulator_Reset();
 }
 
+void Test7_TapeRead()
+{
+    Test_LogInfo(_T("TEST 7: Read tape"));
+    Emulator_Reset();
+
+    Emulator_Run(75);
+    Emulator_KeyboardSequence("5\n");
+    Emulator_Run(25);
+    Test_OpenTape(_T("data\\UKNC_VERT.wav"));
+    Emulator_Run(92 * 25);
+    Test_CloseTape();
+    Emulator_Run(75);
+    Test_CheckScreenshot(_T("data\\test07_1.bmp"));
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(25);
+    Test_CheckScreenshot(_T("data\\test07_2.bmp"));
+
+    Emulator_Reset();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     Test_LogInfo(_T("Initialization..."));
@@ -336,6 +356,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test4_Games();
     Test5_Disks();
     Test6_TurboBasic();
+    Test7_TapeRead();
 
     Test_LogInfo(_T("Finalization..."));
     Emulator_Done();

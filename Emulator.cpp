@@ -15,6 +15,7 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 #include <Share.h>
 #include "Emulator.h"
 #include "emubase\Emubase.h"
+#include "util/WavPcmFile.h"
 
 //NOTE: I know, we use unsafe string functions
 #pragma warning( disable: 4996 )
@@ -43,6 +44,11 @@ WORD m_wEmulatorPPUBreakpoint = 0177777;
 DWORD m_dwTickCount = 0;
 DWORD m_dwEmulatorUptime = 0;  // UKNC uptime, seconds, from turn on or reset, increments every 25 frames
 long m_nUptimeFrameCount = 0;
+
+HWAVPCMFILE m_hTapeWavPcmFile = (HWAVPCMFILE) INVALID_HANDLE_VALUE;
+#define TAPE_BUFFER_SIZE 624
+BYTE m_TapeBuffer[TAPE_BUFFER_SIZE];
+BOOL CALLBACK Emulator_TapeReadCallback(UINT samples);
 
 
 const DWORD ScreenView_StandardRGBColors[16] = {
@@ -279,6 +285,48 @@ BOOL Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 BOOL Emulator_AttachFloppyImage(int slot, LPCTSTR sFilePath)
 {
     return g_pBoard->AttachFloppyImage(slot, sFilePath);
+}
+
+// Tape emulator callback used to read a tape recorded data.
+// Input:
+//   samples    Number of samples to play.
+// Output:
+//   result     Bit to put in tape input port.
+BOOL CALLBACK Emulator_TapeReadCallback(unsigned int samples)
+{
+	if (samples == 0) return 0;
+
+    // Scroll buffer
+    memmove(m_TapeBuffer, m_TapeBuffer + samples, TAPE_BUFFER_SIZE - samples);
+
+	UINT value = 0;
+	for (UINT i = 0; i < samples; i++)
+	{
+		value = WavPcmFile_ReadOne(m_hTapeWavPcmFile);
+        *(m_TapeBuffer + TAPE_BUFFER_SIZE - samples + i) = (BYTE)((value >> 24) & 0xff);
+	}
+	BOOL result = (value >= UINT_MAX / 2);
+	return result;
+}
+
+BOOL Emulator_OpenTape(LPCTSTR sFilePath)
+{
+	m_hTapeWavPcmFile = WavPcmFile_Open(sFilePath);
+	if (m_hTapeWavPcmFile == INVALID_HANDLE_VALUE)
+		return FALSE;
+
+    int sampleRate = WavPcmFile_GetFrequency(m_hTapeWavPcmFile);
+    g_pBoard->SetTapeReadCallback(Emulator_TapeReadCallback, sampleRate);
+
+    return TRUE;
+}
+
+void Emulator_CloseTape()
+{
+    g_pBoard->SetTapeReadCallback(NULL, 0);
+
+    WavPcmFile_Close(m_hTapeWavPcmFile);
+	m_hTapeWavPcmFile = (HWAVPCMFILE) INVALID_HANDLE_VALUE;
 }
 
 void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
