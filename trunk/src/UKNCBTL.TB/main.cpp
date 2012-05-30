@@ -16,8 +16,7 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 void Test1_MenuAndSelfTest()
 {
-    Test_LogInfo(_T("TEST 1: Menu & Self Test"));
-    Emulator_Reset();
+    Test_Init(_T("TEST 1: Menu & Self Test"));
 
     Emulator_Run(75);  // Boot: 3 seconds
 
@@ -47,12 +46,13 @@ void Test1_MenuAndSelfTest()
 
     Test_CheckScreenshot(_T("data\\test01_5.bmp"));  // Self test pass 2
     //Emulator_SaveScreenshot(_T("test01_5.bmp"));
+
+    Test_Done();
 }
 
 void Test2_RomBasic()
 {
-    Test_LogInfo(_T("TEST 2: Boot ROM BASIC"));
-    Emulator_Reset();
+    Test_Init(_T("TEST 2: Boot ROM BASIC"));
 
     BOOL res = Emulator_LoadROMCartridge(1, _T("romctr_basic.bin"));
     if (!res)
@@ -94,12 +94,13 @@ void Test2_RomBasic()
     Emulator_Run(25);  // Wait 1 second
 
     Test_CheckScreenshot(_T("data\\test02_2.bmp"));
+
+    Test_Done();
 }
 
 void Test3_FODOSTM1()
 {
-    Test_LogInfo(_T("TEST 3: FODOSTM1"));
-    Emulator_Reset();
+    Test_Init(_T("TEST 3: FODOSTM1"));
 
     Test_CopyFile(_T("data\\fodostm1.dsk"), _T("temp\\fodostm1.dsk"));
     Test_AttachFloppyImage(0, _T("temp\\fodostm1.dsk"));
@@ -173,13 +174,12 @@ void Test3_FODOSTM1()
     Emulator_Run(50);
     Test_SaveScreenshot(_T("test03_ioscan.bmp"));
 
-    Emulator_Reset();
+    Test_Done();
 }
 
 void Test4_Games()
 {
-    Test_LogInfo(_T("TEST 4: Games"));
-    Emulator_Reset();
+    Test_Init(_T("TEST 4: Games"));
 
     Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
     Test_CopyFile(_T("data\\game.dsk"), _T("temp\\game.dsk"));
@@ -211,9 +211,7 @@ void Test4_Games()
     Emulator_Run(400);  // Skip titles
     Emulator_KeyboardSequence("1");  // Game rank
     Emulator_Run(120);
-    //NOTE: Почему-то после Test1_MenuAndSelfTest() эта игра рисует спрайты неправильно
-    Test_SaveScreenshot(_T("test04_3.bmp"));
-    //Test_CheckScreenshot(_T("data\\test04_3.bmp"));
+    Test_CheckScreenshot(_T("data\\test04_3.bmp"));
 
     Emulator_Reset();
 
@@ -247,13 +245,12 @@ void Test4_Games()
     Emulator_Run(50);
     Test_CheckScreenshot(_T("data\\test04_7.bmp"));
 
-    Emulator_Reset();
+    Test_Done();
 }
 
 void Test5_Disks()
 {
-    Test_LogInfo(_T("TEST 5: Disks"));
-    Emulator_Reset();
+    Test_Init(_T("TEST 5: Disks"));
 
     Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
     Test_CreateDiskImage(_T("temp\\tempdisk.dsk"), 40);
@@ -296,13 +293,12 @@ void Test5_Disks()
     Emulator_Run(75);
     Test_CheckScreenshot(_T("data\\test05_3.bmp"));
 
-    Emulator_Reset();
+    Test_Done();
 }
 
 void Test6_TurboBasic()
 {
-    Test_LogInfo(_T("TEST 6: Turbo Basic"));
-    Emulator_Reset();
+    Test_Init(_T("TEST 6: Turbo Basic"));
 
     Test_CopyFile(_T("data\\turbo.dsk"), _T("temp\\turbo.dsk"));
     Test_AttachFloppyImage(0, _T("temp\\turbo.dsk"));
@@ -317,13 +313,12 @@ void Test6_TurboBasic()
     Emulator_Run(500);
     Test_CheckScreenshot(_T("data\\test06_1.bmp"));
 
-    Emulator_Reset();
+    Test_Done();
 }
 
 void Test7_TapeRead()
 {
-    Test_LogInfo(_T("TEST 7: Read tape"));
-    Emulator_Reset();
+    Test_Init(_T("TEST 7: Read tape"));
 
     Emulator_Run(75);
     Emulator_KeyboardSequence("5\n");
@@ -337,13 +332,12 @@ void Test7_TapeRead()
     Emulator_Run(25);
     Test_CheckScreenshot(_T("data\\test07_2.bmp"));
 
-    Emulator_Reset();
+    Test_Done();
 }
 
 void Test8_GD()
 {
-    Test_LogInfo(_T("TEST 8: GD"));
-    Emulator_Reset();
+    Test_Init(_T("TEST 8: GD"));
 
     Test_CopyFile(_T("data\\GD.dsk"), _T("temp\\GD.dsk"));
     Test_AttachFloppyImage(1, _T("temp\\GD.dsk"));
@@ -425,7 +419,7 @@ void Test8_GD()
     Emulator_Run((2125 - 979) * 10);
     Test_CheckScreenshot(_T("data\\test08_16.bmp"));
 
-    Emulator_Reset();
+    Test_Done();
 }
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -445,7 +439,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test5_Disks();
     Test6_TurboBasic();
     Test7_TapeRead();
-    //Test8_GD();
+    Test8_GD();
 
     Test_LogInfo(_T("Finalization..."));
     Emulator_Done();

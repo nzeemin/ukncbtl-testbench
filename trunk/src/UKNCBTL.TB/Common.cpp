@@ -146,6 +146,8 @@ void Test_Log(char eventtype, LPCTSTR message)
     WORD fgcolor = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
     if (eventtype == 'E')
         fgcolor = FOREGROUND_RED|FOREGROUND_INTENSITY;
+    else if (eventtype == '!')
+        fgcolor = FOREGROUND_GREEN|FOREGROUND_INTENSITY;
     //TODO: Show UKNC uptime
     SYSTEMTIME stm;
     ::GetLocalTime(&stm);
@@ -166,6 +168,18 @@ void Test_LogFormat(char eventtype, LPCTSTR format, ...)
     va_end(ptr);
 
     Test_Log(eventtype, buffer);
+}
+
+void Test_Init(LPCTSTR sTestTitle)
+{
+    Test_Log('!', sTestTitle);
+
+    Emulator_Init();
+}
+
+void Test_Done()
+{
+    Emulator_Done();
 }
 
 void Test_AttachFloppyImage(int slot, LPCTSTR sFilePath)

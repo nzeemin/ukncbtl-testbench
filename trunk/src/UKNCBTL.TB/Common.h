@@ -68,6 +68,9 @@ void Test_LogFormat(char eventtype, LPCTSTR format, ...);
 inline void Test_LogInfo(LPCTSTR message) { Test_Log('i', message); }
 inline void Test_LogError(LPCTSTR message) { Test_Log('E', message); }
 
+void Test_Init(LPCTSTR sTestTitle);
+void Test_Done();
+
 void Test_AttachFloppyImage(int slot, LPCTSTR sFilePath);
 
 void Test_OpenTape(LPCTSTR sFilePath);
