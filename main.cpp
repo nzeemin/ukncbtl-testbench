@@ -340,6 +340,94 @@ void Test7_TapeRead()
     Emulator_Reset();
 }
 
+void Test8_GD()
+{
+    Test_LogInfo(_T("TEST 8: GD"));
+    Emulator_Reset();
+
+    Test_CopyFile(_T("data\\GD.dsk"), _T("temp\\GD.dsk"));
+    Test_AttachFloppyImage(1, _T("temp\\GD.dsk"));
+
+    Emulator_Run(75);
+    Emulator_KeyboardPressReleaseChar('1');
+    Emulator_KeyboardPressRelease(0133);  // Right arrow
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(750);  // Boot from MZ1
+    Emulator_KeyboardSequence("SET GD ON\n");
+    Emulator_Run(150);
+    Emulator_KeyboardSequence("MOUNT LD0 TST1\n");
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("ASS LD0 DK\n");
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("RU TST1\n");
+    Emulator_Run(200);
+    Emulator_KeyboardPressRelease(077);  // @
+    Emulator_KeyboardSequence("DEM1\n");
+    Emulator_Run(100);
+    Emulator_KeyboardPressReleaseChar('\n');
+    Emulator_Run(25);
+
+    //TCHAR buffer[100];
+    //for (int i = 0; i < 507; i++)
+    //{
+    //    swprintf(buffer, 100, _T("video\\tst1_%04u.bmp"), i);
+    //    Test_SaveScreenshot(buffer);
+    //    Emulator_Run(10);
+    //}
+    Emulator_Run(109 * 10);
+    Test_CheckScreenshot(_T("data\\test08_01.bmp"));
+    Emulator_Run((203 - 109) * 10);
+    Test_CheckScreenshot(_T("data\\test08_02.bmp"));
+    Emulator_Run((295 - 203) * 10);
+    Test_CheckScreenshot(_T("data\\test08_03.bmp"));
+    Emulator_Run((338 - 295) * 10);
+    Test_CheckScreenshot(_T("data\\test08_04.bmp"));
+    Emulator_Run((422 - 338) * 10);
+    Test_CheckScreenshot(_T("data\\test08_05.bmp"));
+    Emulator_Run((448 - 422) * 10);
+    Test_CheckScreenshot(_T("data\\test08_06.bmp"));
+    Emulator_Run((495 - 448) * 10);
+    Test_CheckScreenshot(_T("data\\test08_07.bmp"));
+    Emulator_Run((507 - 495) * 10);
+
+    Emulator_KeyboardSequence("EXIT\n");
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("ASS MZ1 DK\n");
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("MOUNT LD1 TST2\n");
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("ASS LD1 DK\n");
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("RU TST2\n");
+    Emulator_Run(200);
+    Test_CheckScreenshot(_T("data\\test08_10.bmp"));
+    Emulator_KeyboardPressRelease(077);  // @
+    Emulator_KeyboardSequence("DEM2\n");
+    Emulator_Run(50);
+
+    //TCHAR buffer[100];
+    //for (int i = 0; i < 2125; i++)
+    //{
+    //    swprintf(buffer, 100, _T("video\\tst2_%04u.bmp"), i);
+    //    Test_SaveScreenshot(buffer);
+    //    Emulator_Run(10);
+    //}
+    Emulator_Run(206 * 10);
+    Test_CheckScreenshot(_T("data\\test08_11.bmp"));
+    Emulator_Run((283 - 206) * 10);
+    Test_CheckScreenshot(_T("data\\test08_12.bmp"));
+    Emulator_Run((508 - 283) * 10);
+    Test_CheckScreenshot(_T("data\\test08_13.bmp"));
+    Emulator_Run((624 - 508) * 10);
+    Test_CheckScreenshot(_T("data\\test08_14.bmp"));
+    Emulator_Run((979 - 624) * 10);
+    Test_CheckScreenshot(_T("data\\test08_15.bmp"));
+    Emulator_Run((2125 - 979) * 10);
+    Test_CheckScreenshot(_T("data\\test08_16.bmp"));
+
+    Emulator_Reset();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     Test_LogInfo(_T("Initialization..."));
@@ -357,6 +445,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test5_Disks();
     Test6_TurboBasic();
     Test7_TapeRead();
+    //Test8_GD();
 
     Test_LogInfo(_T("Finalization..."));
     Emulator_Done();
