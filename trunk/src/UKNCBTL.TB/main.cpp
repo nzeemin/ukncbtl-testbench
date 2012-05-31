@@ -39,20 +39,16 @@ void Test1_MenuAndSelfTest()
     Emulator_KeyboardPressRelease(0153);  // "Enter"
 
     Emulator_Run(20);
-
     Test_CheckScreenshot(_T("data\\test01_4.bmp"));  // Self test pass 1
-
     Emulator_Run(25 * 200);
-
     Test_CheckScreenshot(_T("data\\test01_5.bmp"));  // Self test pass 2
-    //Emulator_SaveScreenshot(_T("test01_5.bmp"));
 
     Test_Done();
 }
 
-void Test2_RomBasic()
+void Test2_Basic()
 {
-    Test_Init(_T("TEST 2: Boot ROM BASIC"));
+    Test_Init(_T("TEST 2: BASIC"));
 
     BOOL res = Emulator_LoadROMCartridge(1, _T("romctr_basic.bin"));
     if (!res)
@@ -94,6 +90,20 @@ void Test2_RomBasic()
     Emulator_Run(25);  // Wait 1 second
 
     Test_CheckScreenshot(_T("data\\test02_2.bmp"));
+
+    Emulator_Reset();
+    Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\disk1.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
+    Emulator_Run(75);  // Boot: 3 seconds
+
+    Emulator_KeyboardSequence("RU DBAS\n");
+    Emulator_Run(190);  // Boot BASIC: 5 seconds
+    Test_CheckScreenshot(_T("data\\test02_5.bmp"));
 
     Test_Done();
 }
@@ -433,7 +443,7 @@ int _tmain(int argc, _TCHAR* argv[])
     }
 
     Test1_MenuAndSelfTest();
-    Test2_RomBasic();
+    Test2_Basic();
     Test3_FODOSTM1();
     Test4_Games();
     Test5_Disks();
