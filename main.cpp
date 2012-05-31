@@ -255,6 +255,46 @@ void Test4_Games()
     Emulator_Run(50);
     Test_CheckScreenshot(_T("data\\test04_7.bmp"));
 
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("RU MZ1:SPION\n");
+    Emulator_Run(275);
+    Test_CheckScreenshot(_T("data\\test04_8.bmp"));
+    Emulator_KeyboardSequence("1");  // Game rank
+    Emulator_Run(50);
+    Test_CheckScreenshot(_T("data\\test04_9.bmp"));
+
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("RU MZ1:GARDEN\n");
+    Emulator_Run(210);
+    Test_CheckScreenshot(_T("data\\test04_10.bmp"));
+    Emulator_KeyboardSequence(" ");
+    Emulator_Run(75);
+    Test_CheckScreenshot(_T("data\\test04_11.bmp"));
+
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("RU MZ1:CAT\n");
+    Emulator_Run(250);
+    //NOTE: Непонятно в чём дело, не идёт дальше
+    Test_SaveScreenshot(_T("test04_12.bmp"));
+
     Test_Done();
 }
 
@@ -322,6 +362,13 @@ void Test6_TurboBasic()
     Emulator_KeyboardSequence("TURBO\n");
     Emulator_Run(500);
     Test_CheckScreenshot(_T("data\\test06_1.bmp"));
+
+    //TODO: Load TESTGR.BAS and run, see http://zx.pk.ru/showpost.php?p=420453&postcount=238
+    Emulator_KeyboardPressRelease(0012);  // "K3"
+    Emulator_Run(200);
+    //NOTE: Почему-то диалог не заполняется как надо, сколько ни жди; в эмуляторе работает нормально
+    Test_SaveScreenshot(_T("test06_2.bmp"));
+    //Emulator_KeyboardSequence("TESTGR\n");
 
     Test_Done();
 }
