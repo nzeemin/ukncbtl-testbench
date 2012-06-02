@@ -310,6 +310,43 @@ void Test4_Games()
     Emulator_Run(100);
     Test_CheckScreenshot(_T("data\\test04_15.bmp"));
 
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("RU MZ1:CHESS\n");
+    Emulator_Run(100);
+    //Test_SaveScreenshot(_T("test04_16.bmp"));  // Description page 1
+    Emulator_KeyboardPressReleaseChar('\n');
+    Emulator_Run(20);
+    //Test_SaveScreenshot(_T("test04_17.bmp"));  // Description page 2
+    Emulator_KeyboardPressReleaseChar('\n');
+    Emulator_Run(1000);
+    Emulator_KeyboardSequence("P/E2-E4\n");
+    Emulator_Run(20);
+    Test_CheckScreenshot(_T("data\\test04_19.bmp"));
+
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("RU MZ1:TETRIS\n");
+    Emulator_Run(350);
+    Test_CheckScreenshot(_T("data\\test04_20.bmp"));
+    Emulator_KeyboardPressReleaseChar('\n');
+    Emulator_Run(250);
+    Emulator_KeyboardSequence("Y");  // Have you color TV?
+    Emulator_Run(10);
+    Emulator_KeyboardSequence("1\n");  // Level (1..10)?
+    Emulator_Run(20);
+    Test_SaveScreenshot(_T("data\\test04_21.bmp"));
+
     Test_Done();
 }
 
