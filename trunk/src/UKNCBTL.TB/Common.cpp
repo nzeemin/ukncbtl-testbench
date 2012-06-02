@@ -189,6 +189,37 @@ void Test_AttachFloppyImage(int slot, LPCTSTR sFilePath)
         Test_LogFormat('E', _T("FAILED to attach floppy image %s"), sFilePath);
 }
 
+void Test_AttachHardImage(int slot, LPCTSTR sFilePath)
+{
+    BOOL res = Emulator_AttachHardImage(slot, sFilePath);
+    if (!res)
+        Test_LogFormat('E', _T("FAILED to attach HDD image %s"), sFilePath);
+}
+
+void Test_CreateHardImage(BYTE sectors, BYTE heads, int cylinders, LPCTSTR sFileName)
+{
+    LONG fileSize = (LONG)sectors * (LONG)heads * (LONG)cylinders * (LONG)512;
+	HANDLE hFile = ::CreateFile(sFileName,
+		GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
+    {
+        Test_LogFormat('E', _T("FAILED to create HDD image %s"), sFileName);
+        return;
+    }
+
+    // Zero-fill the file
+    ::SetFilePointer(hFile, fileSize, NULL, FILE_BEGIN);
+    ::SetEndOfFile(hFile);
+
+    // Write sectors and heads values
+    ::SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+    DWORD dwBytesWritten;
+    ::WriteFile(hFile, &sectors, 1, &dwBytesWritten, NULL);
+    ::WriteFile(hFile, &heads, 1, &dwBytesWritten, NULL);
+
+    ::CloseHandle(hFile);
+}
+
 void Test_OpenTape(LPCTSTR sFilePath)
 {
     BOOL res = Emulator_OpenTape(sFilePath);

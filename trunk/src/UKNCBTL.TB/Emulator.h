@@ -39,6 +39,7 @@ void Emulator_PrepareScreenRGB32(void* pBits, const DWORD* colors);
 
 BOOL Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath);
 BOOL Emulator_AttachFloppyImage(int slot, LPCTSTR sFilePath);
+BOOL Emulator_AttachHardImage(int slot, LPCTSTR sFilePath);
 
 BOOL Emulator_OpenTape(LPCTSTR sFilePath);
 void Emulator_CloseTape();
