@@ -295,6 +295,21 @@ void Test4_Games()
     //NOTE: Непонятно в чём дело, не идёт дальше
     Test_SaveScreenshot(_T("test04_12.bmp"));
 
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("RU MZ1:LAND\n");
+    Emulator_Run(200);
+    Test_CheckScreenshot(_T("data\\test04_14.bmp"));
+    Emulator_Run(10);
+    Emulator_KeyboardPressReleaseChar(' ', 15);
+    Emulator_Run(100);
+    Test_CheckScreenshot(_T("data\\test04_15.bmp"));
+
     Test_Done();
 }
 

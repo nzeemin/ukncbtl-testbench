@@ -46,8 +46,8 @@ void Emulator_CloseTape();
 BOOL Emulator_Run(int frames);
 BOOL Emulator_SaveScreenshot(LPCTSTR sFileName);
 int  Emulator_CheckScreenshot(LPCTSTR sFileName);
-void Emulator_KeyboardPressRelease(BYTE ukncscan);
-void Emulator_KeyboardPressReleaseChar(char ch);
+void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout = 3);
+void Emulator_KeyboardPressReleaseChar(char ch, int timeout = 3);
 void Emulator_KeyboardSequence(const char * str);
 void Emulator_KeyboardPressReleaseShift(BYTE ukncscan);
 

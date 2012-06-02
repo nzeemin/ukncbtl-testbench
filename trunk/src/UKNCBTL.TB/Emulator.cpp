@@ -645,10 +645,10 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName)
     return result;
 }
 
-void Emulator_KeyboardPressRelease(BYTE ukncscan)
+void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout)
 {
 	g_pBoard->KeyboardEvent(ukncscan, TRUE);
-    Emulator_Run(3);
+    Emulator_Run(timeout);
 	g_pBoard->KeyboardEvent(ukncscan, FALSE);
     Emulator_Run(3);
 }
@@ -673,12 +673,12 @@ const BYTE arrChar2UkncScan[256] = {
 /*f*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
 };
 
-void Emulator_KeyboardPressReleaseChar(char ch)
+void Emulator_KeyboardPressReleaseChar(char ch, int timeout)
 {
     BYTE scan = arrChar2UkncScan[(BYTE)ch];
     if (scan == 0)
         return;
-    Emulator_KeyboardPressRelease(scan);
+    Emulator_KeyboardPressRelease(scan, timeout);
 }
 
 void Emulator_KeyboardSequence(const char * str)
