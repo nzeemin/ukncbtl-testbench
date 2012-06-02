@@ -174,7 +174,7 @@ void Emulator_Reset()
     g_pBoard->Reset();
 
     m_nUptimeFrameCount = 0;
-    m_dwEmulatorUptime = 0;
+    //m_dwEmulatorUptime = 0;
 
     //MainWindow_UpdateAllViews();
 }
@@ -243,6 +243,11 @@ int Emulator_SystemFrame()
     }
 
     return 1;
+}
+
+DWORD Emulator_GetUptime()
+{
+    return m_dwEmulatorUptime;
 }
 
 BOOL Emulator_Run(int frames)

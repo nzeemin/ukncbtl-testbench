@@ -15,6 +15,10 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 //////////////////////////////////////////////////////////////////////
 
+DWORD m_dwTotalEmulatorUptime = 0;  // Total UKNC uptime, seconds
+
+
+//////////////////////////////////////////////////////////////////////
 
 BOOL AssertFailedLine(LPCSTR lpszFileName, int nLine)
 {
@@ -179,7 +183,13 @@ void Test_Init(LPCTSTR sTestTitle)
 
 void Test_Done()
 {
+    m_dwTotalEmulatorUptime += Emulator_GetUptime();
     Emulator_Done();
+}
+
+void Test_LogSummary()
+{
+    Test_LogFormat('i', _T("Emulator time spent: %u seconds"), m_dwTotalEmulatorUptime);
 }
 
 void Test_LoadROMCartridge(int slot, LPCTSTR sFilePath)
