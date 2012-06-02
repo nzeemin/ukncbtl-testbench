@@ -345,7 +345,7 @@ void Test4_Games()
     Emulator_Run(10);
     Emulator_KeyboardSequence("1\n");  // Level (1..10)?
     Emulator_Run(20);
-    Test_SaveScreenshot(_T("data\\test04_21.bmp"));
+    Test_CheckScreenshot(_T("data\\test04_21.bmp"));
 
     Test_Done();
 }
@@ -531,6 +531,141 @@ void Test8_GD()
     Test_Done();
 }
 
+void Test9_HDD()
+{
+    Test_Init(_T("TEST 9: HDD"));
+
+    BOOL res = Emulator_LoadROMCartridge(1, _T("data\\ide_wdromv0110.bin"));
+    if (!res)
+    {
+        Test_LogError(_T("Failed to load WDROM image."));
+        exit(1);
+    }
+
+    Test_CopyFile(_T("data\\sys1002wdx.dsk"), _T("temp\\sys1002wdx.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\sys1002wdx.dsk"));
+
+    // Create empty HDD image
+    // (63 sectors/track) * (4 heads) * (80 tracks) * (512 bytes/sector) = 10321920 bytes = 9.84375 MB
+    Test_CreateHardImage(63, 4, 80, _T("temp\\hdd.img"));
+    Test_AttachHardImage(1, _T("temp\\hdd.img"));
+
+    // Boot from the sys1002wdx.dsk
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(350);
+    Emulator_KeyboardSequence("\n");
+    Emulator_Run(50);
+
+    // Run WDX and answer all the questions
+    Emulator_KeyboardSequence("RU WDX\n");
+    Emulator_Run(125);
+    Emulator_KeyboardSequence("1\n");  // Which slot should I use [1:12] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("N\n");  // May read default block from file. Do it [Y] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("Y\n");  // Should clean data. Do it [N] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("\n");  // May execute autodetect. Do it [Y] ?
+    Emulator_Run(100);
+    Test_CheckScreenshot(_T("data\\test09_02.bmp"));  // Autodetected params
+    Emulator_KeyboardSequence("\n");  // Disk parameters're correctly set; continue. Do it [Y] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("4\n");  // Enter number of partitions [1:124] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("6047\n");  // Partition #00 size, blocks
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("6048\n");  // Partition #01 size
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("\n");  // Partition #02 size
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("\n");  // Partition #03 size
+    Emulator_Run(75);
+    Test_CheckScreenshot(_T("data\\test09_03.bmp"));  // Partitions table
+    Emulator_KeyboardSequence("Y\n");  // Test a partition. Do it [N] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("1\n");  // Partition to test
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("\n");  // First block
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("\n");  // Last block
+    Emulator_Run(75);
+    //Test_SaveScreenshot(_T("test09_04.bmp"));  // Partition test complete
+    Emulator_KeyboardSequence("N\n");  // Test a partition. Do it [Y] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("300\n");  // Enter time for awiting in ticks [0:0450] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("N\n");  // There'll be made a hidden partition. Do it [Y] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("\n");  // Size of PP memory shift, bytes [0:032767] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("N\n");  // Should look on data. Do it [Y] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("N\n");  // Should save data in file. Do it [Y] ?
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("Y\n");  // Is ready to load out master block onto disk. Do it [N] ?
+    Emulator_Run(25);
+    Test_CheckScreenshot(_T("data\\test09_05.bmp"));  // WDX completed
+
+    Emulator_KeyboardSequence("SET WD SYSGEN\n");
+    Emulator_Run(50);
+
+    // Reboot from the same floppy
+    Emulator_Reset();
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(350);
+    Emulator_KeyboardSequence("\n");
+    Emulator_Run(50);
+
+    // Run WDR
+    Emulator_KeyboardSequence("RU WDR\n");
+    Emulator_Run(50);
+    //Test_SaveScreenshot(_T("test09_06.bmp"));  // WDR installed
+
+    // Load WD driver
+    //NOTE: The following statement fails with the message "Invalid device WD:"
+    Emulator_KeyboardSequence("LOAD WD\n");
+    Emulator_Run(50);
+    //Test_SaveScreenshot(_T("test09_07.bmp"));
+
+    // Initialize the first HDD partition
+    Emulator_KeyboardSequence("DIR WD0:\n");
+    Emulator_Run(50);
+    //Test_SaveScreenshot(_T("test09_08.bmp"));  // "Invalid directory"
+    Emulator_KeyboardSequence("INIT WD0:\n");
+    Emulator_Run(50);
+    Emulator_KeyboardSequence("Y\n");  // Are you sure?
+    Emulator_Run(50);
+    //Test_SaveScreenshot(_T("test09_09.bmp"));
+    Emulator_KeyboardSequence("DIR WD0:\n");
+    Emulator_Run(75);
+    Test_CheckScreenshot(_T("data\\test09_10.bmp"));  // 0 Files, 0 Blocks, 6009 Free blocks
+
+    // Copy all files from the floppy to the HDD
+    Emulator_KeyboardSequence("COPY/SYS MZ0: WD0:\n");
+    Emulator_Run(1500);
+    //Test_SaveScreenshot(_T("test09_11.bmp"));
+
+    // Copy the bootloader
+    Emulator_KeyboardSequence("COPY/BOOT:WD WD0:RT11SJ WD0:\n");
+    Emulator_Run(100);
+    Test_CheckScreenshot(_T("data\\test09_12.bmp"));
+
+    // Boot from the HDD image
+    Emulator_Reset();
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("2\n");
+    Emulator_Run(50);
+    Test_CheckScreenshot(_T("data\\test09_15.bmp"));
+    Emulator_Run(350);
+    Emulator_KeyboardSequence("\n");
+    Emulator_Run(50);
+    Test_CheckScreenshot(_T("data\\test09_16.bmp"));
+
+    Test_Done();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     Test_LogInfo(_T("Initialization..."));
@@ -549,6 +684,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test6_TurboBasic();
     Test7_TapeRead();
     Test8_GD();
+    Test9_HDD();
 
     Test_LogInfo(_T("Finalization..."));
     Emulator_Done();

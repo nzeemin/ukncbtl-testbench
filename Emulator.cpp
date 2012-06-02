@@ -287,6 +287,11 @@ BOOL Emulator_AttachFloppyImage(int slot, LPCTSTR sFilePath)
     return g_pBoard->AttachFloppyImage(slot, sFilePath);
 }
 
+BOOL Emulator_AttachHardImage(int slot, LPCTSTR sFilePath)
+{
+    return g_pBoard->AttachHardImage(slot, sFilePath);
+}
+
 // Tape emulator callback used to read a tape recorded data.
 // Input:
 //   samples    Number of samples to play.
