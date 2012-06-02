@@ -182,6 +182,13 @@ void Test_Done()
     Emulator_Done();
 }
 
+void Test_LoadROMCartridge(int slot, LPCTSTR sFilePath)
+{
+    BOOL res = Emulator_LoadROMCartridge(slot, sFilePath);
+    if (!res)
+        Test_LogError(_T("Failed to load ROM cartridge image."));
+}
+
 void Test_AttachFloppyImage(int slot, LPCTSTR sFilePath)
 {
     BOOL res = Emulator_AttachFloppyImage(slot, sFilePath);

@@ -71,6 +71,7 @@ inline void Test_LogError(LPCTSTR message) { Test_Log('E', message); }
 void Test_Init(LPCTSTR sTestTitle);
 void Test_Done();
 
+void Test_LoadROMCartridge(int slot, LPCTSTR sFilePath);
 void Test_AttachFloppyImage(int slot, LPCTSTR sFilePath);
 void Test_AttachHardImage(int slot, LPCTSTR sFilePath);
 void Test_CreateHardImage(BYTE sectors, BYTE heads, int cylinders, LPCTSTR sFilePath);
