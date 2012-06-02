@@ -50,12 +50,7 @@ void Test2_Basic()
 {
     Test_Init(_T("TEST 2: BASIC"));
 
-    BOOL res = Emulator_LoadROMCartridge(1, _T("romctr_basic.bin"));
-    if (!res)
-    {
-        Test_LogError(_T("Failed to load ROM BASIC cartridge."));
-        exit(1);
-    }
+    Test_LoadROMCartridge(1, _T("romctr_basic.bin"));
 
     Emulator_Run(75);  // Boot: 3 seconds
 
@@ -535,12 +530,7 @@ void Test9_HDD()
 {
     Test_Init(_T("TEST 9: HDD"));
 
-    BOOL res = Emulator_LoadROMCartridge(1, _T("data\\ide_wdromv0110.bin"));
-    if (!res)
-    {
-        Test_LogError(_T("Failed to load WDROM image."));
-        exit(1);
-    }
+    Test_LoadROMCartridge(1, _T("data\\ide_wdromv0110.bin"));
 
     Test_CopyFile(_T("data\\sys1002wdx.dsk"), _T("temp\\sys1002wdx.dsk"));
     Test_AttachFloppyImage(0, _T("temp\\sys1002wdx.dsk"));
@@ -668,13 +658,8 @@ void Test9_HDD()
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+    SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
     Test_LogInfo(_T("Initialization..."));
-    BOOL init = Emulator_Init();
-    if (!init)
-    {
-        Test_LogError(_T("Initialization failed."));
-        return 1;
-    }
 
     Test1_MenuAndSelfTest();
     Test2_Basic();
@@ -687,7 +672,14 @@ int _tmain(int argc, _TCHAR* argv[])
     Test9_HDD();
 
     Test_LogInfo(_T("Finalization..."));
-    Emulator_Done();
+    SYSTEMTIME timeTo;  ::GetLocalTime(&timeTo);
+    FILETIME fileTimeFrom;
+    SystemTimeToFileTime(&timeFrom, &fileTimeFrom);
+    FILETIME fileTimeTo;
+    SystemTimeToFileTime(&timeTo, &fileTimeTo);
+
+    DWORD diff = fileTimeTo.dwLowDateTime - fileTimeFrom.dwLowDateTime;  // number of 100-nanosecond intervals
+    Test_LogFormat('i', _T("Time spent: %.3f seconds"), (float)diff / 10000000.0);
 
 	return 0;
 }
