@@ -257,6 +257,17 @@ void Test_SaveScreenshot(LPCTSTR sFileName)
         Test_LogFormat('E', _T("FAILED to save screenshot %s"), sFileName);
 }
 
+void Test_SaveScreenshotSeria(LPCTSTR sFileNameTemplate, int count, int frameStep)
+{
+    TCHAR buffer[255];
+    for (int i = 0; i < count; i++)
+    {
+        swprintf(buffer, 255, sFileNameTemplate, i);
+        Test_SaveScreenshot(buffer);
+        Emulator_Run(frameStep);
+    }
+}
+
 void Test_CheckScreenshot(LPCTSTR sFileName)
 {
     int diff = Emulator_CheckScreenshot(sFileName);
