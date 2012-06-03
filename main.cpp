@@ -436,6 +436,19 @@ void Test7_TapeRead()
     Emulator_Run(25);
     Test_CheckScreenshot(_T("data\\test07_2.bmp"));
 
+    Emulator_Reset();
+    Emulator_Run(75);
+    Emulator_KeyboardSequence("5\n");
+    Emulator_Run(25);
+    Test_OpenTape(_T("data\\UKNC_ANT.wav"));
+    Emulator_Run(247 * 25);
+    Test_CloseTape();
+    Emulator_Run(125);
+    Test_CheckScreenshot(_T("data\\test07_3.bmp"));
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(125);
+    Test_CheckScreenshot(_T("data\\test07_4.bmp"));
+
     Test_Done();
 }
 
