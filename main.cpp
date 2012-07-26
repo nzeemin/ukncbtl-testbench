@@ -688,6 +688,120 @@ void Test9_HDD()
     Test_Done();
 }
 
+void Test10_ITO()
+{
+    Test_Init(_T("TEST 10: ITO disks"));
+
+    Test_CopyFile(_T("data\\ito90.dsk"), _T("temp\\ito90.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\ito90.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(375);  // Boot and wait for menu
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Conan" selected
+    Emulator_Run(300);
+    //NOTE: Не загружается, сколько не жди
+
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(375);  // Boot and wait for menu
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Sammy" selected
+    Emulator_Run(300);
+    //NOTE: Не загружается, сколько не жди
+
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(375);  // Boot and wait for menu
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Knight" selected
+    Emulator_Run(500);
+    Test_CheckScreenshot(_T("data\\test10_10.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter" on the title screen
+    Emulator_Run(75);
+    Test_CheckScreenshot(_T("data\\test10_11.bmp"));
+
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(375);  // Boot and wait for menu
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Lode Runner" selected
+    Emulator_Run(650);
+    Test_CheckScreenshot(_T("data\\test10_12.bmp"));
+    //Emulator_KeyboardPressRelease(0153);  // "Enter" on the title screen
+    //NOTE: Не понял как запустить игру
+
+    Emulator_Reset();
+
+    Test_CopyFile(_T("data\\ito91.dsk"), _T("temp\\ito91.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\ito91.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(375);  // Boot and wait for menu
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Puckman" selected
+    Emulator_Run(225);
+    Test_CheckScreenshot(_T("data\\test10_14.bmp"));
+    Emulator_Run(225);
+    Test_CheckScreenshot(_T("data\\test10_15.bmp"));
+    Emulator_Run(225);
+    Test_CheckScreenshot(_T("data\\test10_16.bmp"));  // Ready!
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- start the game
+    Emulator_Run(100);
+    Test_CheckScreenshot(_T("data\\test10_17.bmp"));
+
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(375);  // Boot and wait for menu
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Arkanoid" selected
+    Emulator_Run(300);
+    Test_CheckScreenshot(_T("data\\test10_18.bmp"));
+    Emulator_Run(350);
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(75);
+    Test_CheckScreenshot(_T("data\\test10_19.bmp"));  // In-game screen
+
+    Emulator_Reset();
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(375);  // Boot and wait for menu
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Road Fighter" selected
+    Emulator_Run(550);
+    Test_CheckScreenshot(_T("data\\test10_20.bmp"));
+    Emulator_Run(350);
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(375);
+    Test_CheckScreenshot(_T("data\\test10_21.bmp"));
+
+    //Test_SaveScreenshotSeria(_T("video\\test10_%04u.bmp"), 30, 25);
+
+    Test_Done();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
@@ -702,6 +816,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test7_TapeRead();
     Test8_GD();
     Test9_HDD();
+    Test10_ITO();
 
     Test_LogInfo(_T("Finalization..."));
     SYSTEMTIME timeTo;  ::GetLocalTime(&timeTo);
@@ -715,5 +830,5 @@ int _tmain(int argc, _TCHAR* argv[])
 
     Test_LogSummary();
 
-	return 0;
+    return 0;
 }
