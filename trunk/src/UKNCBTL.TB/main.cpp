@@ -802,6 +802,32 @@ void Test10_ITO()
     Test_Done();
 }
 
+void Test11_SteelRat()
+{
+    Test_Init(_T("TEST 11: Steel Rat"));
+
+    Test_CopyFile(_T("data\\steel_rat.dsk"), _T("temp\\steel_rat.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\steel_rat.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(15 * 25);
+    Test_CheckScreenshot(_T("data\\test11_01.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("0\n");
+    Emulator_Run(6 * 25);
+    Test_CheckScreenshot(_T("data\\test11_02.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(4 * 25);
+    Test_CheckScreenshot(_T("data\\test11_03.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(5 * 25);
+    Test_CheckScreenshot(_T("data\\test11_04.bmp"));
+
+    Test_Done();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
@@ -817,6 +843,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test8_GD();
     Test9_HDD();
     Test10_ITO();
+    Test11_SteelRat();
 
     Test_LogInfo(_T("Finalization..."));
     SYSTEMTIME timeTo;  ::GetLocalTime(&timeTo);
