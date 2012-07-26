@@ -179,6 +179,22 @@ void Test3_FODOSTM1()
     Emulator_Run(50);
     Test_SaveScreenshot(_T("test03_ioscan.bmp"));
 
+    Emulator_KeyboardSequence("SPEED\n");
+    Emulator_Run(550);
+
+    // Turn off the timer
+    Emulator_KeyboardPressRelease(0152);  // "УСТ"
+    Emulator_Run(5);
+    Emulator_KeyboardPressReleaseChar('8');  // Timer
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0133);  // Right arrow
+    Emulator_Run(5);
+    Emulator_KeyboardPressReleaseChar('2');  // Off
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0151);  // "ИСП"
+    Emulator_Run(10);
+    Test_SaveScreenshot(_T("test03_speed2.bmp"));
+
     Test_Done();
 }
 
@@ -828,6 +844,32 @@ void Test11_SteelRat()
     Test_Done();
 }
 
+void Test12_JEK()
+{
+    Test_Init(_T("TEST 12: JEK"));
+
+    Test_CopyFile(_T("data\\jek.dsk"), _T("temp\\jek.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\jek.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(30 * 25);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- date
+    Emulator_Run(6 * 25);
+    Emulator_KeyboardSequence("DEA DK\n");
+    Emulator_Run(3 * 25);
+    Emulator_KeyboardSequence("JEK\n");
+    Emulator_Run(5 * 25);
+    Emulator_KeyboardSequence("LE\n");
+    Emulator_Run(15 * 25);
+    //NOTE: По невыясненной причине застревает после второй заливки -- нет фиолетового цвета
+    Test_SaveScreenshot(_T("test12_01.bmp"));
+
+    //Test_SaveScreenshotSeria(_T("video\\test12_%04u.bmp"), 10, 25);
+
+    Test_Done();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
@@ -844,6 +886,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test9_HDD();
     Test10_ITO();
     Test11_SteelRat();
+    Test12_JEK();
 
     Test_LogInfo(_T("Finalization..."));
     SYSTEMTIME timeTo;  ::GetLocalTime(&timeTo);
