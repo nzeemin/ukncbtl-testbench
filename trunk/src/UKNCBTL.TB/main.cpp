@@ -303,7 +303,7 @@ void Test4_Games()
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("RU MZ1:CAT\n");
     Emulator_Run(250);
-    //NOTE: Непонятно в чём дело, не идёт дальше
+    //NOTE: Непонятно в чём дело, не идёт дальше (переподключение дисков НЕ помогает)
     Test_SaveScreenshot(_T("test04_12.bmp"));
 
     Emulator_Reset();
@@ -447,8 +447,10 @@ void Test6_TurboBasic()
 
     //TODO: Load TESTGR.BAS and run, see http://zx.pk.ru/showpost.php?p=420453&postcount=238
     Emulator_KeyboardPressRelease(0012);  // "K3"
-    Emulator_Run(200);
-    //NOTE: Почему-то диалог не заполняется как надо, сколько ни жди; в эмуляторе работает нормально
+    Emulator_Run(250);
+    //NOTE: Диалог не заполняется как надо, сколько ни жди; в эмуляторе работает нормально
+    //Test_AttachFloppyImage(0, _T("temp\\turbo.dsk"));  // Помогает решить проблему
+    Emulator_Run(300);
     Test_SaveScreenshot(_T("test06_2.bmp"));
     //Emulator_KeyboardSequence("TESTGR\n");
 
@@ -662,7 +664,7 @@ void Test9_HDD()
     //Test_SaveScreenshot(_T("test09_06.bmp"));  // WDR installed
 
     // Load WD driver
-    //NOTE: The following statement fails with the message "Invalid device WD:"
+    // The following statement fails with the message "Invalid device WD:"
     Emulator_KeyboardSequence("LOAD WD\n");
     Emulator_Run(50);
     //Test_SaveScreenshot(_T("test09_07.bmp"));
@@ -715,8 +717,11 @@ void Test10_ITO()
     Emulator_KeyboardSequence("1\n");
     Emulator_Run(375);  // Boot and wait for menu
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Conan" selected
-    Emulator_Run(300);
-    //NOTE: Не загружается, сколько не жди
+    Emulator_Run(1000);
+    //NOTE: Не загружается, сколько не жди, но передёргивание дисковода помогает
+    //Test_AttachFloppyImage(0, _T("temp\\ito90.dsk"));
+    Emulator_Run(1000);
+    Test_SaveScreenshot(_T("test10_06.bmp"));
 
     Emulator_Reset();
 
@@ -726,8 +731,11 @@ void Test10_ITO()
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
     Emulator_Run(3);
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Sammy" selected
-    Emulator_Run(300);
-    //NOTE: Не загружается, сколько не жди
+    Emulator_Run(1000);
+    //NOTE: Не загружается, сколько не жди, но передёргивание дисковода помогает
+    //Test_AttachFloppyImage(0, _T("temp\\ito90.dsk"));
+    Emulator_Run(1000);
+    Test_SaveScreenshot(_T("test10_08.bmp"));
 
     Emulator_Reset();
 
@@ -863,6 +871,8 @@ void Test12_JEK()
     Emulator_KeyboardSequence("LE\n");
     Emulator_Run(15 * 25);
     //NOTE: По невыясненной причине застревает после второй заливки -- нет фиолетового цвета
+    //Test_AttachFloppyImage(0, _T("temp\\jek.dsk"));  // Это помогает
+    Emulator_Run(300);
     Test_SaveScreenshot(_T("test12_01.bmp"));
 
     //Test_SaveScreenshotSeria(_T("video\\test12_%04u.bmp"), 10, 25);
