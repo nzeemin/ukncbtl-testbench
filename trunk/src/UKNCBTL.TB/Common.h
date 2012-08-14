@@ -57,6 +57,9 @@ void DebugLogFormat(LPCTSTR pszFormat, ...);
 // Processor register names
 const TCHAR* REGISTER_NAME[];
 
+const int UKNC_SCREEN_WIDTH = 640;
+const int UKNC_SCREEN_HEIGHT = 288;
+
 void PrintOctalValue(TCHAR* buffer, WORD value);
 
 
@@ -81,8 +84,9 @@ void Test_OpenTape(LPCTSTR sFilePath);
 void Test_CloseTape();
 
 void Test_SaveScreenshot(LPCTSTR sFileName);
-void Test_SaveScreenshotSeria(LPCTSTR sFileNameTemplate, int count, int frameStep);
 void Test_CheckScreenshot(LPCTSTR sFileName);
+void Test_SaveScreenshotSeria(LPCTSTR sFileNameTemplate, int count, int frameStep);
+void Test_SaveAnimatedScreenshot(LPCTSTR sFileName, int count, int frameStep);
 
 void Test_CopyFile(LPCTSTR sFileNameFrom, LPCTSTR sFileNameTo);
 void Test_CreateDiskImage(LPCTSTR sFileName, int tracks);
