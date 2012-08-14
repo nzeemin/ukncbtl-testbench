@@ -12,6 +12,7 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 #include "stdafx.h"
 #include "Emulator.h"
+#include "util\BitmapFile.h"
 
 //////////////////////////////////////////////////////////////////////
 
@@ -47,9 +48,16 @@ void DebugPrint(LPCTSTR message)
     Test_Log('d', message);
 }
 
-void DebugPrintFormat(LPCTSTR pszFormat, ...)
+void DebugPrintFormat(LPCTSTR format, ...)
 {
-    //TODO: Implement in this environment
+    TCHAR buffer[512];
+
+    va_list ptr;
+    va_start(ptr, format);
+    _vsntprintf_s(buffer, 512, 512 - 1, format, ptr);
+    va_end(ptr);
+
+    Test_Log('d', buffer);
 }
 
 const LPCTSTR TRACELOG_FILE_NAME = _T("trace.log");
@@ -266,6 +274,17 @@ void Test_SaveScreenshotSeria(LPCTSTR sFileNameTemplate, int count, int frameSte
         Test_SaveScreenshot(buffer);
         Emulator_Run(frameStep);
     }
+}
+
+void Test_SaveAnimatedScreenshot(LPCTSTR sFileName, int count, int frameStep)
+{
+    HAPNGFILE hFile = ApngFile_Create(sFileName);
+    for (int i = 0; i < count; i++)
+    {
+        Emulator_SaveApngFrame(hFile);
+        Emulator_Run(frameStep);
+    }
+    ApngFile_Close(hFile);
 }
 
 void Test_CheckScreenshot(LPCTSTR sFileName)

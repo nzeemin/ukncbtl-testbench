@@ -13,6 +13,7 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 #pragma once
 
 #include "emubase\Board.h"
+#include "util\BitmapFile.h"
 
 //////////////////////////////////////////////////////////////////////
 
@@ -47,6 +48,7 @@ void Emulator_CloseTape();
 
 BOOL Emulator_Run(int frames);
 BOOL Emulator_SaveScreenshot(LPCTSTR sFileName);
+BOOL Emulator_SaveApngFrame(HAPNGFILE hFile);
 int  Emulator_CheckScreenshot(LPCTSTR sFileName);
 void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout = 3);
 void Emulator_KeyboardPressReleaseChar(char ch, int timeout = 3);
