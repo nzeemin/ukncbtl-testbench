@@ -448,11 +448,13 @@ void Test6_TurboBasic()
     //TODO: Load TESTGR.BAS and run, see http://zx.pk.ru/showpost.php?p=420453&postcount=238
     Emulator_KeyboardPressRelease(0012);  // "K3"
     Emulator_Run(250);
-    //NOTE: Диалог не заполняется как надо, сколько ни жди; в эмуляторе работает нормально
-    //Test_AttachFloppyImage(0, _T("temp\\turbo.dsk"));  // Помогает решить проблему
-    Emulator_Run(300);
+    // Здесь была проблема: "Диалог не заполняется как надо, сколько ни жди; в эмуляторе работает нормально"; исправилось в r397
     Test_SaveScreenshot(_T("test06_2.bmp"));
-    //Emulator_KeyboardSequence("TESTGR\n");
+    Emulator_KeyboardSequence("TESTGR\n");
+    Emulator_Run(150);
+    Test_SaveScreenshot(_T("test06_3.bmp"));
+    //TODO: Compile
+    //TODO: Run
 
     Test_Done();
 }
@@ -717,10 +719,12 @@ void Test10_ITO()
     Emulator_KeyboardSequence("1\n");
     Emulator_Run(375);  // Boot and wait for menu
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Conan" selected
+    Emulator_Run(550);
+    // Здесь была проблама: "Не загружается, сколько не жди, но передёргивание дисковода помогает"; исправилось в r397
+    Test_CheckScreenshot(_T("data\\test10_05.bmp"));
+    Emulator_KeyboardPressRelease(0153, 6);  // "Enter" on the title screen
     Emulator_Run(1000);
-    //NOTE: Не загружается, сколько не жди, но передёргивание дисковода помогает
-    //Test_AttachFloppyImage(0, _T("temp\\ito90.dsk"));
-    Emulator_Run(1000);
+    //NOTE: Тут непонятно -- не появляется надпись "Conan"
     Test_SaveScreenshot(_T("test10_06.bmp"));
 
     Emulator_Reset();
@@ -731,11 +735,14 @@ void Test10_ITO()
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
     Emulator_Run(3);
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Sammy" selected
-    Emulator_Run(1000);
-    //NOTE: Не загружается, сколько не жди, но передёргивание дисковода помогает
-    //Test_AttachFloppyImage(0, _T("temp\\ito90.dsk"));
-    Emulator_Run(1000);
-    Test_SaveScreenshot(_T("test10_08.bmp"));
+    Emulator_Run(800);
+    // Здесь была проблама: "Не загружается, сколько не жди, но передёргивание дисковода помогает"; исправилось в r397
+    Test_CheckScreenshot(_T("data\\test10_08.bmp"));
+    Emulator_KeyboardPressReleaseChar(' ');  // "Space" on the title screen -- turns on "explosions"
+    Emulator_Run(200);
+    Emulator_KeyboardPressReleaseChar(' ');  // "Space" on the title screen with explosions
+    Emulator_Run(375);
+    Test_CheckScreenshot(_T("data\\test10_09.bmp"));
 
     Emulator_Reset();
 
@@ -767,8 +774,11 @@ void Test10_ITO()
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Lode Runner" selected
     Emulator_Run(650);
     Test_CheckScreenshot(_T("data\\test10_12.bmp"));
-    //Emulator_KeyboardPressRelease(0153);  // "Enter" on the title screen
-    //NOTE: Не понял как запустить игру
+    Emulator_KeyboardPressReleaseChar(' ');  // "Space" on the title screen
+    Emulator_Run(450);
+    Emulator_KeyboardPressReleaseChar(' ');  // Start the round
+    Emulator_Run(50);
+    Test_CheckScreenshot(_T("data\\test10_13.bmp"));
 
     Emulator_Reset();
 
@@ -870,9 +880,9 @@ void Test12_JEK()
     Emulator_Run(5 * 25);
     Emulator_KeyboardSequence("LE\n");
     Emulator_Run(15 * 25);
-    //NOTE: По невыясненной причине застревает после второй заливки -- нет фиолетового цвета
-    //Test_AttachFloppyImage(0, _T("temp\\jek.dsk"));  // Это помогает
-    Emulator_Run(300);
+    // Здесь была проблама: "Не загружается, сколько не жди, но передёргивание дисковода помогает"; исправилось в r397
+    Emulator_Run(200);
+    //NOTE: Полученное изображение отличается от изображения на реальной машине
     Test_SaveScreenshot(_T("test12_01.bmp"));
 
     //Test_SaveScreenshotSeria(_T("video\\test12_%04u.bmp"), 10, 25);
