@@ -727,5 +727,29 @@ void Emulator_KeyboardPressReleaseShift(BYTE ukncscan)
     Emulator_Run(3);
 }
 
+void Emulator_KeyboardPressReleaseAlt(BYTE ukncscan)
+{
+	g_pBoard->KeyboardEvent(0107, TRUE);
+    Emulator_Run(3);
+	g_pBoard->KeyboardEvent(ukncscan, TRUE);
+    Emulator_Run(3);
+	g_pBoard->KeyboardEvent(ukncscan, FALSE);
+    Emulator_Run(3);
+	g_pBoard->KeyboardEvent(0107, FALSE);
+    Emulator_Run(3);
+}
+
+void Emulator_KeyboardPressReleaseCtrl(BYTE ukncscan)
+{
+	g_pBoard->KeyboardEvent(046, TRUE);
+    Emulator_Run(3);
+	g_pBoard->KeyboardEvent(ukncscan, TRUE);
+    Emulator_Run(3);
+	g_pBoard->KeyboardEvent(ukncscan, FALSE);
+    Emulator_Run(3);
+	g_pBoard->KeyboardEvent(046, FALSE);
+    Emulator_Run(3);
+}
+
 
 //////////////////////////////////////////////////////////////////////
