@@ -880,6 +880,25 @@ void Test12_JEK()
     Test_Done();
 }
 
+void Test13_PAFCommander()
+{
+    Test_Init(_T("TEST 13: PAF Commander"));
+
+    Test_CopyFile(_T("data\\rt11a5.dsk"), _T("temp\\rt11a5.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\rt11a5.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(20 * 25);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- date
+    Emulator_Run(8 * 25);
+    Emulator_KeyboardSequence("PC\n");
+    Emulator_Run(12 * 25);
+    Test_CheckScreenshot(_T("data\\test13_01.bmp"));
+
+    Test_Done();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
@@ -897,6 +916,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test10_ITO();
     Test11_SteelRat();
     Test12_JEK();
+    Test13_PAFCommander();
 
     Test_LogInfo(_T("Finalization..."));
     SYSTEMTIME timeTo;  ::GetLocalTime(&timeTo);
