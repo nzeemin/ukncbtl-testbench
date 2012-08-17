@@ -54,6 +54,8 @@ void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout = 3);
 void Emulator_KeyboardPressReleaseChar(char ch, int timeout = 3);
 void Emulator_KeyboardSequence(const char * str);
 void Emulator_KeyboardPressReleaseShift(BYTE ukncscan);
+void Emulator_KeyboardPressReleaseAlt(BYTE ukncscan);
+void Emulator_KeyboardPressReleaseCtrl(BYTE ukncscan);
 
 
 //////////////////////////////////////////////////////////////////////

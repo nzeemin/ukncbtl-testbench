@@ -445,16 +445,58 @@ void Test6_TurboBasic()
     Emulator_Run(500);
     Test_CheckScreenshot(_T("data\\test06_1.bmp"));
 
-    //TODO: Load TESTGR.BAS and run, see http://zx.pk.ru/showpost.php?p=420453&postcount=238
+    // Load TESTGR.BAS and run, see http://zx.pk.ru/showpost.php?p=420453&postcount=238
     Emulator_KeyboardPressRelease(0012);  // "K3"
     Emulator_Run(250);
     // Здесь была проблема: "Диалог не заполняется как надо, сколько ни жди; в эмуляторе работает нормально"; исправилось в r397
-    Test_SaveScreenshot(_T("test06_2.bmp"));
+    Test_CheckScreenshot(_T("data\\test06_02.bmp"));
     Emulator_KeyboardSequence("TESTGR\n");
     Emulator_Run(150);
-    Test_SaveScreenshot(_T("test06_3.bmp"));
-    //TODO: Compile
-    //TODO: Run
+    Test_CheckScreenshot(_T("data\\test06_03.bmp"));
+    Emulator_KeyboardPressReleaseAlt(0171);  // Alt+F9 -- Compile
+    Emulator_Run(25 * 9);
+    Test_CheckScreenshot(_T("data\\test06_04.bmp"));
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(50);
+    Emulator_KeyboardPressReleaseCtrl(0171);  // Ctrl+F9 -- Run
+    Emulator_Run(25 * 22);
+    Test_CheckScreenshot(_T("data\\test06_05.bmp"));  // Title screen
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(50);
+    Test_CheckScreenshot(_T("data\\test06_06.bmp"));  // Menu screen
+    Emulator_KeyboardPressRelease(0154, 40);  // "Up arrow"
+    Emulator_KeyboardPressReleaseChar('\n');  // Select "All demonstration"
+    Emulator_Run(25 * 15);
+    Test_CheckScreenshot(_T("data\\test06_07.bmp"));  // Circles
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(5 * 23);
+    Test_CheckScreenshot(_T("data\\test06_08.bmp"));
+    Emulator_KeyboardPressReleaseChar(' ', 6);
+    Emulator_Run(5 * 23);
+    Test_CheckScreenshot(_T("data\\test06_09.bmp"));  // Circles
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(5 * 20);
+    Test_CheckScreenshot(_T("data\\test06_10.bmp"));  // Blocks
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(260);
+    Test_CheckScreenshot(_T("data\\test06_11.bmp"));  // Blocks
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(5 * 23);
+    Test_CheckScreenshot(_T("data\\test06_12.bmp"));  // Line
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(75);
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(5 * 15);
+    Test_CheckScreenshot(_T("data\\test06_14.bmp"));  // Lines
+    Emulator_KeyboardPressReleaseChar(' ');
+    Emulator_Run(5 * 9);
+    Test_CheckScreenshot(_T("data\\test06_15.bmp"));  // Pages
+    Emulator_KeyboardPressReleaseChar(' ', 6);
+    Emulator_Run(5 * 44);
+    Test_CheckScreenshot(_T("data\\test06_16.bmp"));  // Space frogs
+    Emulator_KeyboardPressReleaseChar(' ', 6);
+    Emulator_Run(100);
+    Test_CheckScreenshot(_T("data\\test06_17.bmp"));
 
     Test_Done();
 }
