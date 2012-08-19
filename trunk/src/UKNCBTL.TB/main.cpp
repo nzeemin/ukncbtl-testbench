@@ -35,8 +35,7 @@ void Test1_MenuAndSelfTest()
     Emulator_KeyboardPressRelease(0151);  // "ÈÑÏ"
     Emulator_Run(5);
 
-    Emulator_KeyboardPressRelease(0016);  // "7"
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_KeyboardSequence("7\n");  // "7", Enter
 
     Emulator_Run(20);
     Test_CheckScreenshot(_T("data\\test01_4.bmp"));  // Self test pass 1
@@ -53,37 +52,20 @@ void Test2_Basic()
     Test_LoadROMCartridge(1, _T("romctr_basic.bin"));
 
     Emulator_Run(75);  // Boot: 3 seconds
-
-    Emulator_KeyboardPressRelease(0031);  // "2"
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_KeyboardSequence("2\n");  // Select boot from the cartridge
 
     Emulator_Run(100);  // Boot BASIC: 5 seconds
-
     Test_CheckScreenshot(_T("data\\test02_1.bmp"));
 
     Emulator_KeyboardSequence("PRINT PI\n");
 
-    // 10 FOR I=32 TO 255
-    Emulator_KeyboardSequence("10 FOR I");
-    Emulator_KeyboardPressReleaseShift(0175);  // "="
-    Emulator_KeyboardSequence("32 TO 255\n");
-    // 20 PRINT CHR$(I);
-    Emulator_KeyboardSequence("20 PRINT CHR");
-    Emulator_KeyboardPressReleaseShift(0013);  // "$"
-    Emulator_KeyboardPressReleaseShift(0017);  // "("
-    Emulator_KeyboardPressRelease(0073);  // "I"
-    Emulator_KeyboardPressReleaseShift(0177);  // ")"
-    Emulator_KeyboardSequence(";\n");
-    // 30 IF I MOD 16 = 15 THEN PRINT
-    Emulator_KeyboardSequence("30 IF I MOD 16 ");
-    Emulator_KeyboardPressReleaseShift(0175);  // "="
-    Emulator_KeyboardSequence(" 15 THEN PRINT\n");
-    // 50 NEXT I
+    Emulator_KeyboardSequence("10 FOR I=32 TO 255\n");
+    Emulator_KeyboardSequence("20 PRINT CHR$(I);\n");
+    Emulator_KeyboardSequence("30 IF I MOD 16 = 15 THEN PRINT\n");
     Emulator_KeyboardSequence("50 NEXT I\n");
 
     Emulator_KeyboardPressRelease(0015);  // "K5" == run
     Emulator_Run(25);  // Wait 1 second
-
     Test_CheckScreenshot(_T("data\\test02_2.bmp"));
 
     Emulator_Reset();
@@ -99,6 +81,21 @@ void Test2_Basic()
     Emulator_KeyboardSequence("RU DBAS\n");
     Emulator_Run(190);  // Boot BASIC: 5 seconds
     Test_CheckScreenshot(_T("data\\test02_5.bmp"));
+
+    // BASIC speed test by Sergey Frolov, see http://www.leningrad.su/calc/speed.php
+    Emulator_KeyboardSequence("4 FOR I = 1 TO 10\n");
+    Emulator_KeyboardSequence("5 A = 1.0000001\n");
+    Emulator_KeyboardSequence("10 B = A\n");
+    Emulator_KeyboardSequence("15 FOR J = 1 TO 27\n");
+    Emulator_KeyboardSequence("20 A = A * A\n");
+    Emulator_KeyboardSequence("25 B = B ^ 2.01\n");
+    Emulator_KeyboardSequence("30 NEXT J\n");
+    Emulator_KeyboardSequence("35 NEXT I\n");
+    Emulator_KeyboardSequence("40 PRINT A, B\n");
+    Emulator_KeyboardPressRelease(0015);  // "K5" == run
+    Emulator_Run(143);
+
+    Test_SaveScreenshot(_T("test02_6.bmp"));
 
     Test_Done();
 }
@@ -559,13 +556,6 @@ void Test8_GD()
     Emulator_KeyboardPressReleaseChar('\n');
     Emulator_Run(25);
 
-    //TCHAR buffer[100];
-    //for (int i = 0; i < 507; i++)
-    //{
-    //    swprintf(buffer, 100, _T("video\\tst1_%04u.bmp"), i);
-    //    Test_SaveScreenshot(buffer);
-    //    Emulator_Run(10);
-    //}
     Emulator_Run(109 * 10);
     Test_CheckScreenshot(_T("data\\test08_01.bmp"));
     Emulator_Run((203 - 109) * 10);
@@ -597,13 +587,6 @@ void Test8_GD()
     Emulator_KeyboardSequence("DEM2\n");
     Emulator_Run(50);
 
-    //TCHAR buffer[100];
-    //for (int i = 0; i < 2125; i++)
-    //{
-    //    swprintf(buffer, 100, _T("video\\tst2_%04u.bmp"), i);
-    //    Test_SaveScreenshot(buffer);
-    //    Emulator_Run(10);
-    //}
     Emulator_Run(206 * 10);
     Test_CheckScreenshot(_T("data\\test08_11.bmp"));
     Emulator_Run((283 - 206) * 10);
