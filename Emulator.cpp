@@ -780,3 +780,74 @@ void Emulator_KeyboardPressReleaseCtrl(BYTE ukncscan)
 
 
 //////////////////////////////////////////////////////////////////////
+
+
+BOOL Emulator_SaveImage(LPCTSTR sFilePath)
+{
+    // Create file
+    FILE* fpFile = ::_tfsopen(sFilePath, _T("w+b"), _SH_DENYWR);
+    if (fpFile == NULL)
+        return FALSE;
+
+    // Allocate memory
+    BYTE* pImage = (BYTE*) ::malloc(UKNCIMAGE_SIZE);
+    memset(pImage, 0, UKNCIMAGE_SIZE);
+    // Prepare header
+    DWORD* pHeader = (DWORD*) pImage;
+    *pHeader++ = UKNCIMAGE_HEADER1;
+    *pHeader++ = UKNCIMAGE_HEADER2;
+    *pHeader++ = UKNCIMAGE_VERSION;
+    *pHeader++ = UKNCIMAGE_SIZE;
+    // Store emulator state to the image
+    g_pBoard->SaveToImage(pImage);
+    *(DWORD*)(pImage + 16) = m_dwEmulatorUptime;
+
+    // Save image to the file
+    DWORD dwBytesWritten = ::fwrite(pImage, 1, UKNCIMAGE_SIZE, fpFile);
+    //TODO: Check if dwBytesWritten != UKNCIMAGE_SIZE
+
+    // Free memory, close file
+    ::free(pImage);
+    ::fclose(fpFile);
+
+    return TRUE;
+}
+
+BOOL Emulator_LoadImage(LPCTSTR sFilePath)
+{
+    // Open file
+    FILE* fpFile = ::_tfsopen(sFilePath, _T("rb"), _SH_DENYWR);
+    if (fpFile == NULL)
+        return FALSE;
+
+    Emulator_Stop();
+
+    // Read header
+    DWORD bufHeader[UKNCIMAGE_HEADER_SIZE / sizeof(DWORD)];
+    DWORD dwBytesRead = ::fread(bufHeader, 1, UKNCIMAGE_HEADER_SIZE, fpFile);
+    //TODO: Check if dwBytesRead != UKNCIMAGE_HEADER_SIZE
+    
+    //TODO: Check version and size
+
+    // Allocate memory
+    BYTE* pImage = (BYTE*) ::malloc(UKNCIMAGE_SIZE);
+
+    // Read image
+    ::fseek(fpFile, 0, SEEK_SET);
+    dwBytesRead = ::fread(pImage, 1, UKNCIMAGE_SIZE, fpFile);
+    //TODO: Check if dwBytesRead != UKNCIMAGE_SIZE
+
+    // Restore emulator state from the image
+    g_pBoard->LoadFromImage(pImage);
+
+    m_dwEmulatorUptime = *(DWORD*)(pImage + 16);
+
+    // Free memory, close file
+    ::free(pImage);
+    ::fclose(fpFile);
+
+    return TRUE;
+}
+
+
+//////////////////////////////////////////////////////////////////////

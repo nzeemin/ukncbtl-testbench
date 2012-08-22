@@ -57,5 +57,8 @@ void Emulator_KeyboardPressReleaseShift(BYTE ukncscan);
 void Emulator_KeyboardPressReleaseAlt(BYTE ukncscan);
 void Emulator_KeyboardPressReleaseCtrl(BYTE ukncscan);
 
+BOOL Emulator_SaveImage(LPCTSTR sFilePath);
+BOOL Emulator_LoadImage(LPCTSTR sFilePath);
+
 
 //////////////////////////////////////////////////////////////////////
