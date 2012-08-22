@@ -332,5 +332,20 @@ void Test_CreateDiskImage(LPCTSTR sFileName, int tracks)
     ::CloseHandle(hFile);
 }
 
+void Test_SaveStateImage(LPCTSTR sFileName)
+{
+    if (Emulator_SaveImage(sFileName))
+        Test_LogFormat('i', _T("Saved state image %s"), sFileName);
+    else
+        Test_LogFormat('E', _T("FAILED to save state image %s"), sFileName);
+}
+void Test_LoadStateImage(LPCTSTR sFileName)
+{
+    if (Emulator_LoadImage(sFileName))
+        Test_LogFormat('i', _T("Loaded state image %s"), sFileName);
+    else
+        Test_LogFormat('E', _T("FAILED to load state image %s"), sFileName);
+}
+
 
 //////////////////////////////////////////////////////////////////////

@@ -91,5 +91,8 @@ void Test_SaveAnimatedScreenshot(LPCTSTR sFileName, int count, int frameStep);
 void Test_CopyFile(LPCTSTR sFileNameFrom, LPCTSTR sFileNameTo);
 void Test_CreateDiskImage(LPCTSTR sFileName, int tracks);
 
+void Test_SaveStateImage(LPCTSTR sFileName);
+void Test_LoadStateImage(LPCTSTR sFileName);
+
 
 //////////////////////////////////////////////////////////////////////
