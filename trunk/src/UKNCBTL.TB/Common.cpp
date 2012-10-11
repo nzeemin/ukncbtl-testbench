@@ -251,7 +251,12 @@ void Test_OpenTape(LPCTSTR sFilePath)
     if (!res)
         Test_LogFormat('E', _T("FAILED to open tape image %s"), sFilePath);
 }
-
+void Test_CreateTape(LPCTSTR sFilePath)
+{
+    BOOL res = Emulator_CreateTape(sFilePath);
+    if (!res)
+        Test_LogFormat('E', _T("FAILED to create tape image %s"), sFilePath);
+}
 void Test_CloseTape()
 {
     Emulator_CloseTape();

@@ -35,7 +35,7 @@ void Test1_MenuAndSelfTest()
     Emulator_KeyboardPressRelease(0151);  // "ИСП"
     Emulator_Run(5);
 
-    Emulator_KeyboardSequence("7\n");  // "7", Enter
+    Emulator_KeyboardSequence("7\n");  // Select "7 - тестирование", Enter
 
     Emulator_Run(20);
     Test_CheckScreenshot(_T("data\\test01_4.bmp"));  // Self test pass 1
@@ -934,6 +934,35 @@ void Test13_PAFCommander()
     Test_Done();
 }
 
+void Test14_TapeReadWrite()
+{
+    Test_Init(_T("TEST 14: Tape read/write"));
+
+    Test_LoadROMCartridge(1, _T("romctr_basic.bin"));
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("2\n");  // Select boot from the cartridge
+    Emulator_Run(100);  // Boot BASIC: 5 seconds
+
+    Emulator_KeyboardSequence("10 PRINT PI\n");
+
+    Emulator_KeyboardSequence("CSAVE \"PI\"\n");
+    Test_CreateTape(_T("temp\\test14_01.wav"));
+    Emulator_Run(25 * 12);
+    Test_CloseTape();
+    Test_CheckScreenshot(_T("data\\test14_01.bmp"));
+
+    Emulator_KeyboardSequence("NEW\n");
+    Emulator_KeyboardSequence("CLOAD \"PI\"\n");
+    Test_OpenTape(_T("temp\\test14_01.wav"));
+    Emulator_Run(25 * 12);
+    Test_CloseTape();
+    Emulator_KeyboardSequence("LIST\n");
+    Emulator_Run(5);
+    Test_CheckScreenshot(_T("data\\test14_02.bmp"));
+
+    Test_Done();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
@@ -952,6 +981,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test11_SteelRat();
     Test12_JEK();
     Test13_PAFCommander();
+    Test14_TapeReadWrite();
 
     Test_LogInfo(_T("Finalization..."));
     SYSTEMTIME timeTo;  ::GetLocalTime(&timeTo);
