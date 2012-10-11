@@ -49,6 +49,7 @@ HWAVPCMFILE m_hTapeWavPcmFile = (HWAVPCMFILE) INVALID_HANDLE_VALUE;
 #define TAPE_BUFFER_SIZE 624
 BYTE m_TapeBuffer[TAPE_BUFFER_SIZE];
 BOOL CALLBACK Emulator_TapeReadCallback(UINT samples);
+BOOL CALLBACK Emulator_TapeWriteCallback(UINT samples);
 
 
 const DWORD ScreenView_StandardRGBColors[16] = {
@@ -319,6 +320,22 @@ BOOL CALLBACK Emulator_TapeReadCallback(unsigned int samples)
 	return result;
 }
 
+void CALLBACK Emulator_TapeWriteCallback(int value, UINT samples)
+{
+    if (samples == 0) return;
+
+    // Scroll buffer
+    memmove(m_TapeBuffer, m_TapeBuffer + samples, TAPE_BUFFER_SIZE - samples);
+
+    // Write samples to the file
+    for (UINT i = 0; i < samples; i++)
+    {
+        WavPcmFile_WriteOne(m_hTapeWavPcmFile, value);
+        //TODO: Check WavPcmFile_WriteOne result
+        *(m_TapeBuffer + TAPE_BUFFER_SIZE - samples + i) = (BYTE)((value >> 24) & 0xff);
+    }
+}
+
 BOOL Emulator_OpenTape(LPCTSTR sFilePath)
 {
 	m_hTapeWavPcmFile = WavPcmFile_Open(sFilePath);
@@ -331,9 +348,22 @@ BOOL Emulator_OpenTape(LPCTSTR sFilePath)
     return TRUE;
 }
 
+BOOL Emulator_CreateTape(LPCTSTR sFilePath)
+{
+	m_hTapeWavPcmFile = WavPcmFile_Create(sFilePath, 22050);
+	if (m_hTapeWavPcmFile == INVALID_HANDLE_VALUE)
+		return FALSE;
+
+    int sampleRate = WavPcmFile_GetFrequency(m_hTapeWavPcmFile);
+    g_pBoard->SetTapeWriteCallback(Emulator_TapeWriteCallback, sampleRate);
+
+    return TRUE;
+}
+
 void Emulator_CloseTape()
 {
     g_pBoard->SetTapeReadCallback(NULL, 0);
+    g_pBoard->SetTapeWriteCallback(NULL, 0);
 
     WavPcmFile_Close(m_hTapeWavPcmFile);
 	m_hTapeWavPcmFile = (HWAVPCMFILE) INVALID_HANDLE_VALUE;
@@ -355,9 +385,10 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
     BOOL okTagType = FALSE;  // Type of 4-word tag: TRUE - set palette, FALSE - set params
     int scale = 1;           // Horizontal scale: 1, 2, 4, or 8
     DWORD palette = 0;       // Palette
+    DWORD palettecurrent[8];  memset(palettecurrent, 0, sizeof(palettecurrent)); // Current palette; update each time we change the "palette" variable
 	BYTE pbpgpr = 7;         // 3-bit Y-value modifier
-    for (int yy = 0; yy < 307; yy++) {
-
+    for (int yy = 0; yy < 307; yy++)
+    {
         if (okTagSize) {  // 4-word tag
             WORD tag1 = g_pBoard->GetRAMWord(0, address);
             address += 2;
@@ -367,20 +398,22 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
             if (okTagType)  // 4-word palette tag
             {
                 palette = MAKELONG(tag1, tag2);
+                for (BYTE c = 0; c < 8; c++)  // Update palettecurrent
+                {
+                    BYTE valueYRGB = (BYTE) (palette >> (c << 2)) & 15;
+                    palettecurrent[c] = colors[valueYRGB];
+                }
             }
             else  // 4-word params tag
             {
                 scale = (tag2 >> 4) & 3;  // Bits 4-5 - new scale value
-                //TODO: use Y-value modifier
                 pbpgpr = tag2 & 7;  // Y-value modifier
                 cursorYRGB = tag1 & 15;  // Cursor color
                 okCursorType = ((tag1 & 16) != 0);  // TRUE - graphical cursor, FALSE - symbolic cursor
                 ASSERT(okCursorType==0);  //DEBUG
                 cursorPos = ((tag1 >> 8) >> scale) & 0x7f;  // Cursor position in the line
-                //TODO: Use cursorAddress
                 cursorAddress = (tag1 >> 5) & 7;
                 scale = 1 << scale;
-
             }
         }
 
@@ -410,7 +443,7 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
             //   Translate value to 24-bit RGB
             //   Put value to m_bits; repeat using scale value
 
-            int x = 0;
+            int xr = 640;
             int y = yy - 19;
             DWORD* pBits = ((DWORD*)pImageBits) + (288 - 1 - y) * 640;
             for (int pos = 0; ; pos++)
@@ -420,33 +453,51 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
                 BYTE src1 = g_pBoard->GetRAMByte(1, addressBits);
                 BYTE src2 = g_pBoard->GetRAMByte(2, addressBits);
                 // Loop through the bits of the byte
-                for (int bit = 0; bit < 8; bit++)
+                int bit = 0;
+                while (true)
                 {
-                    // Make 3-bit value from the bits
-                    //BYTE value012 = (src0 & 1) | (src1 & 1) * 2 | (src2 & 1) * 4;
-					BYTE value012;
-					// Map value to palette; result is 4-bit value YRGB
-                    BYTE valueYRGB;
+                    DWORD valueRGB;
                     if (cursorOn && (pos == cursorPos) && (!okCursorType || (okCursorType && bit == cursorAddress)))
-                        valueYRGB = cursorYRGB;
+                        valueRGB = colors[cursorYRGB];  // 4-bit to 32-bit color
                     else
 					{
-						value012 = (src0 & 1) | (src1 & 1) * 2 | (src2 & 1) * 4;
-						valueYRGB = (BYTE) (palette >> (value012 * 4)) & 15;
+	                    // Make 3-bit value from the bits
+						BYTE value012 = (src0 & 1) | ((src1 & 1) << 1) | ((src2 & 1) << 2);
+                        valueRGB = palettecurrent[value012];  // 3-bit to 32-bit color
 					}
-                    DWORD valueRGB = colors[valueYRGB];
 
                     // Put value to m_bits; repeat using scale value
-                    for (int s = 0; s < scale; s++)
+                    switch (scale)
+                    {
+                    case 8:
                         *pBits++ = valueRGB;
-                    x += scale;
+                        *pBits++ = valueRGB;
+                        *pBits++ = valueRGB;
+                        *pBits++ = valueRGB;
+                    case 4:
+                        *pBits++ = valueRGB;
+                        *pBits++ = valueRGB;
+                    case 2:
+                        *pBits++ = valueRGB;
+                    case 1:
+                        *pBits++ = valueRGB;
+                    default:
+                        break;
+                    }
+                    //WAS: for (int s = 0; s < scale; s++) *pBits++ = valueRGB;
+
+                    xr -= scale;
+
+                    if (bit == 7)
+                        break;
+                    bit++;
 
                     // Shift to the next bit
                     src0 = src0 >> 1;
                     src1 = src1 >> 1;
                     src2 = src2 >> 1;
                 }
-                if (x >= 640)
+                if (xr <= 0)
                     break;  // End of line
                 addressBits++;  // Go to the next byte
             }
@@ -534,8 +585,6 @@ BOOL Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
     ::free(pData);
     if (dwBytesWritten != bih.biSizeImage)
         return FALSE;
-
-    ::free(pData);
 
     // Close file
     CloseHandle(hFile);
@@ -701,7 +750,7 @@ const BYTE arrChar2UkncScanShift[256] = {
 /*       0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f  */
 /*0*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
 /*1*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*2*/    0000, 0000, 0000, 0000, 0013, 0000, 0000, 0000, 0017, 0177, 0174, 0000, 0000, 0000, 0000, 0000, 
+/*2*/    0000, 0000, 0031, 0000, 0013, 0000, 0000, 0000, 0017, 0177, 0174, 0000, 0000, 0000, 0000, 0000, 
 /*3*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0175, 0000, 0000,
 /*4*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
 /*5*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
@@ -803,7 +852,7 @@ BOOL Emulator_SaveImage(LPCTSTR sFilePath)
     *(DWORD*)(pImage + 16) = m_dwEmulatorUptime;
 
     // Save image to the file
-    DWORD dwBytesWritten = ::fwrite(pImage, 1, UKNCIMAGE_SIZE, fpFile);
+    size_t dwBytesWritten = ::fwrite(pImage, 1, UKNCIMAGE_SIZE, fpFile);
     //TODO: Check if dwBytesWritten != UKNCIMAGE_SIZE
 
     // Free memory, close file
@@ -824,7 +873,7 @@ BOOL Emulator_LoadImage(LPCTSTR sFilePath)
 
     // Read header
     DWORD bufHeader[UKNCIMAGE_HEADER_SIZE / sizeof(DWORD)];
-    DWORD dwBytesRead = ::fread(bufHeader, 1, UKNCIMAGE_HEADER_SIZE, fpFile);
+    size_t dwBytesRead = ::fread(bufHeader, 1, UKNCIMAGE_HEADER_SIZE, fpFile);
     //TODO: Check if dwBytesRead != UKNCIMAGE_HEADER_SIZE
     
     //TODO: Check version and size

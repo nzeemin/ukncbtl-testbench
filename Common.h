@@ -81,6 +81,7 @@ void Test_AttachHardImage(int slot, LPCTSTR sFilePath);
 void Test_CreateHardImage(BYTE sectors, BYTE heads, int cylinders, LPCTSTR sFilePath);
 
 void Test_OpenTape(LPCTSTR sFilePath);
+void Test_CreateTape(LPCTSTR sFilePath);
 void Test_CloseTape();
 
 void Test_SaveScreenshot(LPCTSTR sFileName);

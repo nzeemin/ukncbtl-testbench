@@ -44,6 +44,7 @@ BOOL Emulator_AttachFloppyImage(int slot, LPCTSTR sFilePath);
 BOOL Emulator_AttachHardImage(int slot, LPCTSTR sFilePath);
 
 BOOL Emulator_OpenTape(LPCTSTR sFilePath);
+BOOL Emulator_CreateTape(LPCTSTR sFilePath);
 void Emulator_CloseTape();
 
 BOOL Emulator_Run(int frames);
