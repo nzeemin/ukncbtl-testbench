@@ -97,6 +97,15 @@ void Test2_Basic()
 
     Test_SaveScreenshot(_T("test02_6.bmp"));
 
+    Emulator_KeyboardSequence("NEW\n");
+    Emulator_Run(10);
+    Emulator_KeyboardSequence("1  !\"#$%&\'()*+,-./\n");
+    Emulator_KeyboardSequence("2 0123456789:;<=>?\n");
+    Emulator_KeyboardSequence("3 @[\\]^_ `{|}~\n");
+    Emulator_KeyboardSequence("4 ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
+    Emulator_KeyboardSequence("5 abcdefghijklmnopqrstuvwxyz\n");
+    Test_SaveScreenshot(_T("test02_tt.bmp"));
+
     Test_Done();
 }
 
