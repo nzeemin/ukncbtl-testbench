@@ -14,6 +14,36 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 #include "Emulator.h"
 
 
+void ListBusDevices(const CBusDevice** pDevices)
+{
+    while ((*pDevices) != NULL)
+    {
+        Test_LogFormat('i', _T("  %s"), (*pDevices)->GetName());
+        const WORD * pRanges = (*pDevices)->GetAddressRanges();
+        while (*pRanges != 0)
+        {
+            WORD start = *pRanges;  pRanges++;
+            WORD length = *pRanges;  pRanges++;
+            Test_LogFormat('i', _T("    %06o-%06o"), start, start+length-1);
+        }
+        pDevices++;
+    }
+}
+
+void Test0_ListBusDevices()
+{
+    Test_Init(_T("TEST 0: Bus devices list"));
+
+    const CBusDevice** device1 = g_pBoard->GetCPUBusDevices();
+    Test_LogInfo(_T("CPU bus devices:"));
+    ListBusDevices(device1);
+    const CBusDevice** device2 = g_pBoard->GetPPUBusDevices();
+    Test_LogInfo(_T("PPU bus devices:"));
+    ListBusDevices(device2);
+
+    Test_Done();
+}
+
 void Test1_MenuAndSelfTest()
 {
     Test_Init(_T("TEST 1: Menu & Self Test"));
@@ -977,6 +1007,7 @@ int _tmain(int argc, _TCHAR* argv[])
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
     Test_LogInfo(_T("Initialization..."));
 
+    Test0_ListBusDevices();
     Test1_MenuAndSelfTest();
     Test2_Basic();
     Test3_FODOSTM1();
