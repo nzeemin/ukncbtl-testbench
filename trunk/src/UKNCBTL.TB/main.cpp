@@ -83,7 +83,6 @@ void Test2_Basic()
 
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("2\n");  // Select boot from the cartridge
-
     Emulator_Run(100);  // Boot BASIC: 5 seconds
     Test_CheckScreenshot(_T("data\\test02_1.bmp"));
 
@@ -135,6 +134,35 @@ void Test2_Basic()
     Emulator_KeyboardSequence("4 ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
     Emulator_KeyboardSequence("5 abcdefghijklmnopqrstuvwxyz\n");
     Test_SaveScreenshot(_T("test02_tt.bmp"));
+
+    Emulator_Reset();
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("2\n");  // Select boot from the cartridge
+    Emulator_Run(100);  // Boot BASIC: 5 seconds
+
+    // Random number generator check by Leonid Broukhis http://www.mailcom.com/bk0010/
+    Emulator_KeyboardSequence("NEW\n");
+    Emulator_Run(10);
+    Emulator_KeyboardSequence("10 SCREEN 2\n");
+    Emulator_KeyboardSequence("20 FOR I=0 TO 1000\n");
+    Emulator_KeyboardSequence("30 PSET (RND(1)*640, RND(1)*264)\n");
+    Emulator_KeyboardSequence("40 NEXT\n");
+    Emulator_KeyboardSequence("50 GOTO 50\n");
+    Emulator_KeyboardSequence("RUN\n");
+    Emulator_Run(175);
+    Test_CheckScreenshot(_T("data\\test02_rnd1.bmp"));
+    Emulator_KeyboardPressRelease(0004);  // Press STOP
+    Emulator_KeyboardSequence("NEW\n");
+    Emulator_Run(10);
+    Emulator_KeyboardSequence("10 SCREEN 2\n");
+    Emulator_KeyboardSequence("20 FOR I%=0% TO 32766%\n");
+    Emulator_KeyboardSequence("30 PSET (RND(1)*640%, RND(1)*264%), RND(1)*9%\n");
+    Emulator_KeyboardSequence("40 NEXT\n");
+    Emulator_KeyboardSequence("50 GOTO 50\n");
+    Emulator_KeyboardSequence("RUN\n");
+    Emulator_Run(3950);
+    Test_CheckScreenshot(_T("data\\test02_rnd2.bmp"));
+    //Test_SaveScreenshotSeria(_T("video\\test02_%04u.bmp"), 20, 25);
 
     Test_Done();
 }
