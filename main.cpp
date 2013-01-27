@@ -458,6 +458,10 @@ void Test5_Disks()
     Emulator_Run(200);  // Boot: 8 seconds
     Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
     Emulator_Run(75);  // Boot: 3 seconds
+    
+    Emulator_KeyboardSequence("SHOW CONF\n");
+    Emulator_Run(150);
+    Test_CheckScreenshot(_T("data\\test05_0.bmp"));
 
     // Initialize MZ1: disk
     Emulator_KeyboardSequence("INIT MZ1:\n");
