@@ -1034,6 +1034,86 @@ void Test14_TapeReadWrite()
     Test_Done();
 }
 
+void Test15_VariousTS()
+{
+    Test_Init(_T("TEST 15: Various"));
+
+    Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\disk1.dsk"));
+    Test_CopyFile(_T("data\\various.dsk"), _T("temp\\various.dsk"));
+    Test_AttachFloppyImage(1, _T("temp\\various.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
+    Emulator_Run(75);  // Boot: 3 seconds
+    
+    // TEST SYSTEM V01.01 Трушин А. МНПП "Техноком", Зеленоград, 1992 г.
+    Emulator_KeyboardSequence("RU MZ1:TS\n");
+    Emulator_Run(75);
+    Test_CheckScreenshot(_T("data\\test15_00.bmp"));
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "CPU RAM Test" selected
+    Emulator_Run(280);
+    Test_CheckScreenshot(_T("data\\test15_01.bmp"));
+    Emulator_Run(50);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(3);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "PPU RAM Test" selected
+    Emulator_Run(200);
+    Test_CheckScreenshot(_T("data\\test15_02.bmp"));
+    Emulator_Run(50);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0153, 20);  // "Enter" -- "ROM Test" selected
+    Emulator_Run(110);
+    Test_CheckScreenshot(_T("data\\test15_03.bmp"));
+    Emulator_Run(50);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "PPU Test" selected
+    Emulator_Run(180);
+    Test_CheckScreenshot(_T("data\\test15_04.bmp"));
+    Emulator_Run(50);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0153, 10);  // "Enter" -- "CPU Test" selected
+    Emulator_Run(130);
+    Test_CheckScreenshot(_T("data\\test15_05.bmp"));
+    Emulator_Run(50);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0153, 10);  // "Enter" -- "VideoRAM Test" selected
+    Emulator_Run(1240);
+    Test_CheckScreenshot(_T("data\\test15_06.bmp"));
+    Emulator_Run(50);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0153, 10);  // "Enter" -- "Monitor Test" selected
+    Emulator_Run(240);
+    Test_CheckScreenshot(_T("data\\test15_07a.bmp"));
+    Emulator_Run(80);
+    Test_CheckScreenshot(_T("data\\test15_07b.bmp"));
+    Emulator_Run(70);
+    Test_CheckScreenshot(_T("data\\test15_07c.bmp"));
+    Emulator_Run(150);
+    Test_CheckScreenshot(_T("data\\test15_07d.bmp"));
+    Emulator_Run(80);
+    Test_CheckScreenshot(_T("data\\test15_07e.bmp"));
+    Emulator_Run(180);
+    Test_CheckScreenshot(_T("data\\test15_07f.bmp"));
+    Emulator_Run(190);
+    Test_CheckScreenshot(_T("data\\test15_07g.bmp"));
+    Emulator_Run(100);
+    //NOTE: В этом месте почему-то зависает
+
+    //Test_SaveScreenshotSeria(_T("video\\test15_%04u.bmp"), 20, 25);
+
+    Test_Done();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
@@ -1054,6 +1134,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test12_JEK();
     Test13_PAFCommander();
     Test14_TapeReadWrite();
+    Test15_VariousTS();
 
     Test_LogInfo(_T("Finalization..."));
     SYSTEMTIME timeTo;  ::GetLocalTime(&timeTo);
