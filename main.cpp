@@ -1114,6 +1114,29 @@ void Test15_VariousTS()
     Test_Done();
 }
 
+void Test16_Palette128Colors()
+{
+    Test_Init(_T("TEST 16: Palette 128 Colors"));
+
+    Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\disk1.dsk"));
+    Test_CopyFile(_T("data\\various.dsk"), _T("temp\\various.dsk"));
+    Test_AttachFloppyImage(1, _T("temp\\various.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
+    Emulator_Run(75);  // Boot: 3 seconds
+
+    Emulator_KeyboardSequence("RU MZ1:TSPAL\n");
+    Emulator_Run(75);
+
+    Test_CheckScreenshot(_T("data\\test16_01.bmp"));
+
+    Test_Done();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
@@ -1135,6 +1158,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test13_PAFCommander();
     Test14_TapeReadWrite();
     Test15_VariousTS();
+    Test16_Palette128Colors();
 
     Test_LogInfo(_T("Finalization..."));
     SYSTEMTIME timeTo;  ::GetLocalTime(&timeTo);
