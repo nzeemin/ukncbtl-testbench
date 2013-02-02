@@ -52,9 +52,23 @@ BOOL CALLBACK Emulator_TapeReadCallback(UINT samples);
 BOOL CALLBACK Emulator_TapeWriteCallback(UINT samples);
 
 
-const DWORD ScreenView_StandardRGBColors[16] = {
+const DWORD ScreenView_StandardRGBColors[16*8] = {
     0x000000, 0x000080, 0x008000, 0x008080, 0x800000, 0x800080, 0x808000, 0x808080,
     0x000000, 0x0000FF, 0x00FF00, 0x00FFFF, 0xFF0000, 0xFF00FF, 0xFFFF00, 0xFFFFFF,
+    0x000000, 0x000060, 0x008000, 0x008060, 0x800000, 0x800060, 0x808000, 0x808060,
+    0x000000, 0x0000DF, 0x00FF00, 0x00FFDF, 0xFF0000, 0xFF00DF, 0xFFFF00, 0xFFFFDF,
+    0x000000, 0x000080, 0x006000, 0x006080, 0x800000, 0x800080, 0x806000, 0x806080,
+    0x000000, 0x0000FF, 0x00DF00, 0x00DFFF, 0xFF0000, 0xFF00FF, 0xFFDF00, 0xFFDFFF,
+    0x000000, 0x000060, 0x006000, 0x006060, 0x800000, 0x800060, 0x806000, 0x806060,
+    0x000000, 0x0000DF, 0x00DF00, 0x00DFDF, 0xFF0000, 0xFF00DF, 0xFFDF00, 0xFFDFDF,
+    0x000000, 0x000080, 0x008000, 0x008080, 0x600000, 0x600080, 0x608000, 0x608080,
+    0x000000, 0x0000FF, 0x00FF00, 0x00FFFF, 0xDF0000, 0xDF00FF, 0xDFFF00, 0xDFFFFF,
+    0x000000, 0x000060, 0x008000, 0x008060, 0x600000, 0x600060, 0x608000, 0x608060,
+    0x000000, 0x0000DF, 0x00FF00, 0x00FFDF, 0xDF0000, 0xDF00DF, 0xDFFF00, 0xDFFFDF,
+    0x000000, 0x000080, 0x006000, 0x006080, 0x600000, 0x600080, 0x606000, 0x606080,
+    0x000000, 0x0000FF, 0x00DF00, 0x00DFFF, 0xDF0000, 0xDF00FF, 0xDFDF00, 0xDFDFFF,
+    0x000000, 0x000060, 0x006000, 0x006060, 0x600000, 0x600060, 0x606000, 0x606060,
+    0x000000, 0x0000DF, 0x00DF00, 0x00DFDF, 0xDF0000, 0xDF00DF, 0xDFDF00, 0xDFDFDF,
 };
 
 
@@ -386,7 +400,7 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
     int scale = 1;           // Horizontal scale: 1, 2, 4, or 8
     DWORD palette = 0;       // Palette
     DWORD palettecurrent[8];  memset(palettecurrent, 0, sizeof(palettecurrent)); // Current palette; update each time we change the "palette" variable
-	BYTE pbpgpr = 7;         // 3-bit Y-value modifier
+    BYTE pbpgpr = 0;         // 3-bit Y-value modifier
     for (int yy = 0; yy < 307; yy++)
     {
         if (okTagSize) {  // 4-word tag
@@ -398,22 +412,23 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
             if (okTagType)  // 4-word palette tag
             {
                 palette = MAKELONG(tag1, tag2);
-                for (BYTE c = 0; c < 8; c++)  // Update palettecurrent
-                {
-                    BYTE valueYRGB = (BYTE) (palette >> (c << 2)) & 15;
-                    palettecurrent[c] = colors[valueYRGB];
-                }
             }
             else  // 4-word params tag
             {
                 scale = (tag2 >> 4) & 3;  // Bits 4-5 - new scale value
-                pbpgpr = tag2 & 7;  // Y-value modifier
-                cursorYRGB = tag1 & 15;  // Cursor color
+                pbpgpr = (BYTE)((7 - (tag2 & 7)) << 4);  // Y-value modifier
+                cursorYRGB = (BYTE)(tag1 & 15);  // Cursor color
                 okCursorType = ((tag1 & 16) != 0);  // TRUE - graphical cursor, FALSE - symbolic cursor
                 ASSERT(okCursorType==0);  //DEBUG
-                cursorPos = ((tag1 >> 8) >> scale) & 0x7f;  // Cursor position in the line
-                cursorAddress = (tag1 >> 5) & 7;
+                cursorPos = (BYTE)(((tag1 >> 8) >> scale) & 0x7f);  // Cursor position in the line
+                cursorAddress = (BYTE)((tag1 >> 5) & 7);
                 scale = 1 << scale;
+            }
+            for (BYTE c = 0; c < 8; c++)  // Update palettecurrent
+            {
+                BYTE valueYRGB = (BYTE) (palette >> (c << 2)) & 15;
+                palettecurrent[c] = colors[pbpgpr | valueYRGB];
+                //if (pbpgpr != 0) DebugLogFormat(_T("pbpgpr %02x\r\n"), pbpgpr | valueYRGB);
             }
         }
 
@@ -507,8 +522,8 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
 
 BOOL Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
 {
-    ASSERT(sFileName != NULL);
     ASSERT(bits != NULL);
+    ASSERT(sFileName != NULL);
 
     // Create file
     HANDLE hFile = ::CreateFile(sFileName,
@@ -522,16 +537,16 @@ BOOL Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
     hdr.bfType = 0x4d42;  // "BM"
     BITMAPINFOHEADER bih;
     ::ZeroMemory(&bih, sizeof(bih));
-    bih.biSize = sizeof(BITMAPINFOHEADER);
-    bih.biWidth = 640;
-    bih.biHeight = 288;
-    bih.biSizeImage = bih.biWidth * bih.biHeight / 2;
+    bih.biSize = sizeof( BITMAPINFOHEADER );
+    bih.biWidth = UKNC_SCREEN_WIDTH;
+    bih.biHeight = UKNC_SCREEN_HEIGHT;
+    bih.biSizeImage = bih.biWidth * bih.biHeight;
     bih.biPlanes = 1;
-    bih.biBitCount = 4;
+    bih.biBitCount = 8;
     bih.biCompression = BI_RGB;
     bih.biXPelsPerMeter = bih.biXPelsPerMeter = 2000;
     hdr.bfSize = (DWORD) sizeof(BITMAPFILEHEADER) + bih.biSize + bih.biSizeImage;
-    hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) + bih.biSize + sizeof(RGBQUAD) * 16;
+    hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) + bih.biSize + sizeof(RGBQUAD) * 256;
 
     DWORD dwBytesWritten = 0;
 
@@ -546,7 +561,7 @@ BOOL Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
         DWORD rgb = *psrc;
         psrc++;
         BYTE color = 0;
-        for (BYTE c = 0; c < 16; c++)
+        for (BYTE c = 0; c < 128; c++)
         {
             if (palette[c] == rgb)
             {
@@ -554,13 +569,8 @@ BOOL Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
                 break;
             }
         }
-        if ((i & 1) == 0)
-            *pdst = (color << 4);
-        else
-        {
-            *pdst = (*pdst) & 0xf0 | color;
-            pdst++;
-        }
+        *pdst = color;
+        pdst++;
     }
 
     WriteFile(hFile, &hdr, sizeof(BITMAPFILEHEADER), &dwBytesWritten, NULL);
@@ -569,18 +579,26 @@ BOOL Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
         ::free(pData);
         return FALSE;
     }
-    WriteFile(hFile, &bih, bih.biSize, &dwBytesWritten, NULL);
+    WriteFile(hFile, &bih, sizeof(BITMAPINFOHEADER), &dwBytesWritten, NULL);
     if (dwBytesWritten != sizeof(BITMAPINFOHEADER))
     {
         ::free(pData);
         return FALSE;
     }
-    WriteFile(hFile, palette, sizeof(RGBQUAD) * 16, &dwBytesWritten, NULL);
-    if (dwBytesWritten != sizeof(RGBQUAD) * 16)
+    WriteFile(hFile, palette, sizeof(RGBQUAD) * 128, &dwBytesWritten, NULL);
+    if (dwBytesWritten != sizeof(RGBQUAD) * 128)
     {
         ::free(pData);
         return FALSE;
     }
+    //NOTE: Write the palette for the second time, to fill colors #128-255
+    WriteFile(hFile, palette, sizeof(RGBQUAD) * 128, &dwBytesWritten, NULL);
+    if (dwBytesWritten != sizeof(RGBQUAD) * 128)
+    {
+        ::free(pData);
+        return FALSE;
+    }
+
     WriteFile(hFile, pData, bih.biSizeImage, &dwBytesWritten, NULL);
     ::free(pData);
     if (dwBytesWritten != bih.biSizeImage)
@@ -661,10 +679,10 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName, const DWORD * bits, DWORD * temp
     if (dwBytesRead != sizeof(BITMAPINFOHEADER))
         return -1;
     //TODO: Check the header
-    if (bih.biSizeImage != 640 * 288 / 2)
+    if (bih.biSizeImage != 640 * 288)
         return -1;
     // Skip the palette
-    SetFilePointer(hFile, sizeof(RGBQUAD) * 16, 0, FILE_CURRENT);
+    SetFilePointer(hFile, sizeof(RGBQUAD) * 256, 0, FILE_CURRENT);
 
     BYTE * pData = (BYTE *) ::malloc(bih.biSizeImage);
 
@@ -680,14 +698,8 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName, const DWORD * bits, DWORD * temp
     DWORD * pdst = tempbits;
     for (int i = 0; i < 640 * 288; i++)
     {
-        BYTE color = 0;
-        if ((i & 1) == 0)
-            color = (*psrc) >> 4;
-        else
-        {
-            color = (*psrc) & 15;
-            psrc++;
-        }
+        BYTE color = *psrc;
+        psrc++;
         *pdst = ScreenView_StandardRGBColors[color];
         pdst++;
     }
