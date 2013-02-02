@@ -978,8 +978,9 @@ void Test12_JEK()
     Emulator_Run(15 * 25);
     // Здесь была проблама: "Не загружается, сколько не жди, но передёргивание дисковода помогает"; исправилось в r397
     Emulator_Run(200);
-    //NOTE: Полученное изображение отличается от изображения на реальной машине
-    Test_SaveScreenshot(_T("test12_01.bmp"));
+    // Полученное изображение отличается от изображения на реальной машине,
+    // исправилось -- проверено на r482 с палитрой GRB
+    Test_CheckScreenshot(_T("data\\test12_01.bmp"));
 
     //Test_SaveScreenshotSeria(_T("video\\test12_%04u.bmp"), 10, 25);
 
@@ -1106,10 +1107,28 @@ void Test15_VariousTS()
     Test_CheckScreenshot(_T("data\\test15_07f.bmp"));
     Emulator_Run(190);
     Test_CheckScreenshot(_T("data\\test15_07g.bmp"));
-    Emulator_Run(100);
-    //NOTE: В этом месте почему-то зависает
+    Emulator_Run(25);
+    // В этом месте зависало, исправлено в r482. Причину определил Titus:
+    // Нереализованная запись в регистр данных клавиатуры (177702) на шине ПП.
+    // Согласно документации на УКНЦ, запись в регистр данных клавиатуры не предусмотрена,
+    // поэтому сложно сказать, зачем данный тест это делает.
 
-    //Test_SaveScreenshotSeria(_T("video\\test15_%04u.bmp"), 20, 25);
+    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_Run(5);
+    Emulator_KeyboardPressRelease(0153, 10);  // "Enter" -- "Floppy Drive Test" selected
+    Emulator_Run(25);
+    Test_CheckScreenshot(_T("data\\test15_08a.bmp"));
+    Emulator_Run(25);
+    Test_CreateDiskImage(_T("temp\\tempdisk.dsk"), 80);
+    Test_AttachFloppyImage(0, _T("temp\\tempdisk.dsk"));
+    Emulator_KeyboardPressRelease(0153, 10);  // "Enter" -- run the test
+    Emulator_Run(4075);
+    Test_CheckScreenshot(_T("data\\test15_08b.bmp"));
+    Emulator_Run(25);
+
+    //Test_SaveScreenshotSeria(_T("video\\test15_%04u.bmp"), 20, 10);
+
+    //TODO: Остальные тесты
 
     Test_Done();
 }
@@ -1129,10 +1148,16 @@ void Test16_Palette128Colors()
     Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
     Emulator_Run(75);  // Boot: 3 seconds
 
+    // TSPAL by Titus
     Emulator_KeyboardSequence("RU MZ1:TSPAL\n");
     Emulator_Run(75);
-
     Test_CheckScreenshot(_T("data\\test16_01.bmp"));
+    Emulator_KeyboardPressRelease(0153, 10);  // "Enter" -- exit TSPAL
+    Emulator_Run(25);
+
+    Emulator_KeyboardSequence("RU MZ1:DLTST\n");
+    Emulator_Run(75);
+    Test_SaveScreenshot(_T("test16_dltst.bmp"));
 
     Test_Done();
 }
