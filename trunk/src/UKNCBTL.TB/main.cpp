@@ -1186,14 +1186,25 @@ int _tmain(int argc, _TCHAR* argv[])
     Test16_Palette128Colors();
 
     Test_LogInfo(_T("Finalization..."));
+
     SYSTEMTIME timeTo;  ::GetLocalTime(&timeTo);
-    FILETIME fileTimeFrom;
-    SystemTimeToFileTime(&timeFrom, &fileTimeFrom);
+
     FILETIME fileTimeTo;
     SystemTimeToFileTime(&timeTo, &fileTimeTo);
+    ULARGE_INTEGER ulTimeTo;
+    ulTimeTo.LowPart = fileTimeTo.dwLowDateTime;
+    ulTimeTo.HighPart = fileTimeTo.dwHighDateTime;
 
-    DWORD diff = fileTimeTo.dwLowDateTime - fileTimeFrom.dwLowDateTime;  // number of 100-nanosecond intervals
-    Test_LogFormat('i', _T("Time spent: %.3f seconds"), (float)diff / 10000000.0);
+    FILETIME fileTimeFrom;
+    SystemTimeToFileTime(&timeFrom, &fileTimeFrom);
+    ULARGE_INTEGER ulTimeFrom;
+    ulTimeFrom.LowPart = fileTimeFrom.dwLowDateTime;
+    ulTimeFrom.HighPart = fileTimeFrom.dwHighDateTime;
+
+    ULONGLONG ulDiff = ulTimeTo.QuadPart - ulTimeFrom.QuadPart;
+
+    float diff = (float)ulDiff;  // number of 100-nanosecond intervals
+    Test_LogFormat('i', _T("Time spent: %.3f seconds"), diff / 10000000.0);
 
     Test_LogSummary();
 
