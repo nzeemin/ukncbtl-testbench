@@ -1037,7 +1037,7 @@ void Test14_TapeReadWrite()
 
 void Test15_VariousTS()
 {
-    Test_Init(_T("TEST 15: Various"));
+    Test_Init(_T("TEST 15: Various TS"));
 
     Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
     Test_AttachFloppyImage(0, _T("temp\\disk1.dsk"));
@@ -1049,7 +1049,7 @@ void Test15_VariousTS()
     Emulator_Run(200);  // Boot: 8 seconds
     Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
     Emulator_Run(75);  // Boot: 3 seconds
-    
+
     // TEST SYSTEM V01.01 Трушин А. МНПП "Техноком", Зеленоград, 1992 г.
     Emulator_KeyboardSequence("RU MZ1:TS\n");
     Emulator_Run(75);
@@ -1162,6 +1162,30 @@ void Test16_Palette128Colors()
     Test_Done();
 }
 
+void Test17_VariousOther()
+{
+    Test_Init(_T("TEST 17: Various Other"));
+
+    Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
+    Test_AttachFloppyImage(0, _T("temp\\disk1.dsk"));
+    Test_CopyFile(_T("data\\various.dsk"), _T("temp\\various.dsk"));
+    Test_AttachFloppyImage(1, _T("temp\\various.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
+    Emulator_Run(75);  // Boot: 3 seconds
+
+    Emulator_KeyboardSequence("RU MZ1:IOSCAN\n");  // Run I/O port scanner
+    Emulator_Run(50);
+    Emulator_KeyboardSequence("RU MZ1:IOSCPP\n");  // Run I/O port scanner
+    Emulator_Run(50);
+    Test_CheckScreenshot(_T("data\\test17_ioscan.bmp"));
+
+    Test_Done();
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
@@ -1184,6 +1208,7 @@ int _tmain(int argc, _TCHAR* argv[])
     Test14_TapeReadWrite();
     Test15_VariousTS();
     Test16_Palette128Colors();
+    Test17_VariousOther();
 
     Test_LogInfo(_T("Finalization..."));
 
