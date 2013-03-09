@@ -95,5 +95,8 @@ void Test_CreateDiskImage(LPCTSTR sFileName, int tracks);
 void Test_SaveStateImage(LPCTSTR sFileName);
 void Test_LoadStateImage(LPCTSTR sFileName);
 
+#define Test_Assert(f) {if (!(f)) Test_AssertFailed(__FILE__, __LINE__);}
+void Test_AssertFailed(LPCSTR lpszFileName, int nLine);
+
 
 //////////////////////////////////////////////////////////////////////
