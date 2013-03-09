@@ -12,6 +12,7 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 #include "stdafx.h"
 #include "Emulator.h"
+#include "emubase\\Emubase.h"
 
 
 void ListBusDevices(const CBusDevice** pDevices)
@@ -83,7 +84,14 @@ void Test2_Basic()
 
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("2\n");  // Select boot from the cartridge
-    Emulator_Run(100);  // Boot BASIC: 5 seconds
+    Emulator_SetCPUBreakpoint(000000);
+    Test_Assert(!Emulator_Run(5));
+    Test_Assert(g_pBoard->GetCPU()->GetPC() == 000000);
+    BOOL bValid;
+    Test_Assert(g_pBoard->GetCPUMemoryController()->GetWordView(000000, FALSE, TRUE, &bValid) == 0240)
+    Emulator_SetCPUBreakpoint(0177777);
+
+    Emulator_Run(95);  // Boot BASIC: 5 seconds
     Test_CheckScreenshot(_T("data\\test02_1.bmp"));
 
     Emulator_KeyboardSequence("PRINT PI\n");
@@ -122,7 +130,7 @@ void Test2_Basic()
     Emulator_KeyboardSequence("35 NEXT I\n");
     Emulator_KeyboardSequence("40 PRINT A, B\n");
     Emulator_KeyboardPressRelease(0015);  // "K5" == run
-    Emulator_Run(143);
+    Emulator_Run(145);
 
     Test_SaveScreenshot(_T("test02_6.bmp"));
 
@@ -149,7 +157,7 @@ void Test2_Basic()
     Emulator_KeyboardSequence("40 NEXT\n");
     Emulator_KeyboardSequence("50 GOTO 50\n");
     Emulator_KeyboardSequence("RUN\n");
-    Emulator_Run(175);
+    Emulator_Run(180);
     Test_CheckScreenshot(_T("data\\test02_rnd1.bmp"));
     Emulator_KeyboardPressRelease(0004);  // Press STOP
     Emulator_KeyboardSequence("NEW\n");
@@ -160,7 +168,7 @@ void Test2_Basic()
     Emulator_KeyboardSequence("40 NEXT\n");
     Emulator_KeyboardSequence("50 GOTO 50\n");
     Emulator_KeyboardSequence("RUN\n");
-    Emulator_Run(3950);
+    Emulator_Run(4000);
     Test_CheckScreenshot(_T("data\\test02_rnd2.bmp"));
     //Test_SaveScreenshotSeria(_T("video\\test02_%04u.bmp"), 20, 25);
 
@@ -182,13 +190,13 @@ void Test3_FODOSTM1()
     Emulator_Run(1750);
     Test_CheckScreenshot(_T("data\\test03_1.bmp"));
     Emulator_KeyboardPressReleaseChar('\n');
-    Emulator_Run(9550);  // 6:22
+    Emulator_Run(9725);  // 6:29
     Test_CheckScreenshot(_T("data\\test03_2.bmp"));
     Emulator_KeyboardPressReleaseChar('\n');
-    Emulator_Run(2950);  // 1:58
+    Emulator_Run(3150);  // 2:06
     Test_CheckScreenshot(_T("data\\test03_3.bmp"));
     Emulator_KeyboardPressReleaseChar('\n');
-    Emulator_Run(1000);  // 0:40
+    Emulator_Run(1100);  // 0:44
     Test_CheckScreenshot(_T("data\\test03_4.bmp"));
 
     // Turn off the timer
@@ -239,9 +247,6 @@ void Test3_FODOSTM1()
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("1\n");
     Emulator_Run(200);  // Boot from the disk: 8 seconds
-    Emulator_KeyboardSequence("IOSCAN\n");  // Run I/O port scanner
-    Emulator_Run(50);
-    Test_SaveScreenshot(_T("test03_ioscan.bmp"));
 
     Emulator_KeyboardSequence("SPEED\n");
     Emulator_Run(550);
@@ -341,7 +346,7 @@ void Test4_Games()
     Emulator_Run(275);
     Test_CheckScreenshot(_T("data\\test04_8.bmp"));
     Emulator_KeyboardSequence("1");  // Game rank
-    Emulator_Run(50);
+    Emulator_Run(51);
     Test_CheckScreenshot(_T("data\\test04_9.bmp"));
 
     Emulator_Reset();
@@ -352,7 +357,7 @@ void Test4_Games()
     Emulator_KeyboardSequence("01-01-99\n\n\n");
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("RU MZ1:GARDEN\n");
-    Emulator_Run(210);
+    Emulator_Run(220);
     Test_CheckScreenshot(_T("data\\test04_10.bmp"));
     Emulator_KeyboardSequence(" ");
     Emulator_Run(75);
@@ -467,16 +472,13 @@ void Test5_Disks()
     Emulator_KeyboardSequence("INIT MZ1:\n");
     Emulator_Run(50);
     Emulator_KeyboardSequence("Y\n");  // Are you sure?
-    Emulator_Run(50);
+    Emulator_Run(95);
     Emulator_KeyboardSequence("DIR MZ1:\n");
     Emulator_Run(250);
     Test_CheckScreenshot(_T("data\\test05_1.bmp"));
 
-    //DebugLogClear();
-    //DebugLog(_T("Command COPY MZ0:PIP.SAV MZ1:\n"));
     Emulator_KeyboardSequence("COPY MZ0:PIP.SAV MZ1:\n");
     Emulator_Run(1800);
-    //DebugLog(_T("Command DIR MZ1:\n"));
     Emulator_KeyboardSequence("DIR MZ1:\n");
     Emulator_Run(750);
     Test_CheckScreenshot(_T("data\\test05_2.bmp"));
@@ -484,11 +486,11 @@ void Test5_Disks()
     Emulator_KeyboardSequence("COPY /DEVICE MZ0: MZ1:\n");
     Emulator_Run(50);
     Emulator_KeyboardSequence("Y\n");  // Are you sure?
-    Emulator_Run(1750);
+    Emulator_Run(2100);
     Emulator_KeyboardSequence("DIR /SUM MZ1:\n");
     Emulator_Run(150);
     Emulator_KeyboardSequence("BOOT MZ1:\n");
-    Emulator_Run(250);
+    Emulator_Run(425);
     Emulator_KeyboardPressReleaseChar('\n');
     Emulator_Run(75);
     Test_CheckScreenshot(_T("data\\test05_3.bmp"));
@@ -505,21 +507,21 @@ void Test6_TurboBasic()
 
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("1\n");
-    Emulator_Run(125);  // Boot: 8 seconds
+    Emulator_Run(175);  // Boot: 8 seconds
     Emulator_KeyboardSequence("\n");  // Date
     Emulator_Run(75);  // Boot: 3 seconds
 
     Emulator_KeyboardSequence("TURBO\n");
-    Emulator_Run(500);
+    Emulator_Run(600);
     Test_CheckScreenshot(_T("data\\test06_1.bmp"));
 
     // Load TESTGR.BAS and run, see http://zx.pk.ru/showpost.php?p=420453&postcount=238
     Emulator_KeyboardPressRelease(0012);  // "K3"
-    Emulator_Run(250);
+    Emulator_Run(275);
     // Здесь была проблема: "Диалог не заполняется как надо, сколько ни жди; в эмуляторе работает нормально"; исправилось в r397
     Test_CheckScreenshot(_T("data\\test06_02.bmp"));
     Emulator_KeyboardSequence("TESTGR\n");
-    Emulator_Run(150);
+    Emulator_Run(175);
     Test_CheckScreenshot(_T("data\\test06_03.bmp"));
     Emulator_KeyboardPressReleaseAlt(0171);  // Alt+F9 -- Compile
     Emulator_Run(25 * 9);
@@ -527,29 +529,29 @@ void Test6_TurboBasic()
     Emulator_KeyboardPressReleaseChar(' ');
     Emulator_Run(50);
     Emulator_KeyboardPressReleaseCtrl(0171);  // Ctrl+F9 -- Run
-    Emulator_Run(25 * 22);
+    Emulator_Run(27 * 22);
     Test_CheckScreenshot(_T("data\\test06_05.bmp"));  // Title screen
     Emulator_KeyboardPressReleaseChar(' ');
-    Emulator_Run(50);
+    Emulator_Run(62);
     Test_CheckScreenshot(_T("data\\test06_06.bmp"));  // Menu screen
     Emulator_KeyboardPressRelease(0154, 40);  // "Up arrow"
     Emulator_KeyboardPressReleaseChar('\n');  // Select "All demonstration"
-    Emulator_Run(25 * 15);
+    Emulator_Run(28 * 15);
     Test_CheckScreenshot(_T("data\\test06_07.bmp"));  // Circles
     Emulator_KeyboardPressReleaseChar(' ');
-    Emulator_Run(5 * 23);
+    Emulator_Run(5 * 32);
     Test_CheckScreenshot(_T("data\\test06_08.bmp"));
     Emulator_KeyboardPressReleaseChar(' ', 6);
     Emulator_Run(5 * 23);
     Test_CheckScreenshot(_T("data\\test06_09.bmp"));  // Circles
     Emulator_KeyboardPressReleaseChar(' ');
-    Emulator_Run(5 * 20);
+    Emulator_Run(126);
     Test_CheckScreenshot(_T("data\\test06_10.bmp"));  // Blocks
     Emulator_KeyboardPressReleaseChar(' ');
     Emulator_Run(260);
     Test_CheckScreenshot(_T("data\\test06_11.bmp"));  // Blocks
     Emulator_KeyboardPressReleaseChar(' ');
-    Emulator_Run(5 * 23);
+    Emulator_Run(149);
     Test_CheckScreenshot(_T("data\\test06_12.bmp"));  // Line
     Emulator_KeyboardPressReleaseChar(' ');
     Emulator_Run(75);
@@ -557,7 +559,7 @@ void Test6_TurboBasic()
     Emulator_Run(5 * 15);
     Test_CheckScreenshot(_T("data\\test06_14.bmp"));  // Lines
     Emulator_KeyboardPressReleaseChar(' ');
-    Emulator_Run(5 * 9);
+    Emulator_Run(5 * 9 + 6);
     Test_CheckScreenshot(_T("data\\test06_15.bmp"));  // Pages
     Emulator_KeyboardPressReleaseChar(' ', 6);
     Emulator_Run(5 * 44);
@@ -565,6 +567,7 @@ void Test6_TurboBasic()
     Emulator_KeyboardPressReleaseChar(' ', 6);
     Emulator_Run(100);
     Test_CheckScreenshot(_T("data\\test06_17.bmp"));
+    //Test_SaveScreenshotSeria(_T("video\\test06_%04u.bmp"), 50, 2);
 
     Test_Done();
 }
@@ -635,13 +638,13 @@ void Test8_GD()
     Test_CheckScreenshot(_T("data\\test08_03.bmp"));
     Emulator_Run((338 - 295) * 10);
     Test_CheckScreenshot(_T("data\\test08_04.bmp"));
-    Emulator_Run((422 - 338) * 10);
+    Emulator_Run((428 - 338) * 10);
     Test_CheckScreenshot(_T("data\\test08_05.bmp"));
-    Emulator_Run((448 - 422) * 10);
+    Emulator_Run((453 - 428) * 10);
     Test_CheckScreenshot(_T("data\\test08_06.bmp"));
-    Emulator_Run((495 - 448) * 10);
+    Emulator_Run((501 - 453) * 10);
     Test_CheckScreenshot(_T("data\\test08_07.bmp"));
-    Emulator_Run((507 - 495) * 10);
+    Emulator_Run((508 - 501) * 10);
 
     Emulator_KeyboardSequence("EXIT\n");
     Emulator_Run(100);
@@ -652,24 +655,25 @@ void Test8_GD()
     Emulator_KeyboardSequence("ASS LD1 DK\n");
     Emulator_Run(100);
     Emulator_KeyboardSequence("RU TST2\n");
-    Emulator_Run(200);
+    Emulator_Run(215);
     Test_CheckScreenshot(_T("data\\test08_10.bmp"));
     Emulator_KeyboardPressRelease(077);  // @
     Emulator_KeyboardSequence("DEM2\n");
     Emulator_Run(50);
 
-    Emulator_Run(206 * 10);
+    Emulator_Run(208 * 10);
     Test_CheckScreenshot(_T("data\\test08_11.bmp"));
-    Emulator_Run((283 - 206) * 10);
+    Emulator_Run((283 - 208) * 10);
     Test_CheckScreenshot(_T("data\\test08_12.bmp"));
-    Emulator_Run((508 - 283) * 10);
+    Emulator_Run((506 - 283) * 10);
     Test_CheckScreenshot(_T("data\\test08_13.bmp"));
-    Emulator_Run((624 - 508) * 10);
+    Emulator_Run((626 - 506) * 10);
     Test_CheckScreenshot(_T("data\\test08_14.bmp"));
-    Emulator_Run((979 - 624) * 10);
+    Emulator_Run((987 - 626) * 10);
     Test_CheckScreenshot(_T("data\\test08_15.bmp"));
-    Emulator_Run((2125 - 979) * 10);
+    Emulator_Run((2126 - 987) * 10);
     Test_CheckScreenshot(_T("data\\test08_16.bmp"));
+    //Test_SaveScreenshotSeria(_T("video\\test08_%04u.bmp"), 10, 10);
 
     Test_Done();
 }
@@ -782,7 +786,7 @@ void Test9_HDD()
 
     // Copy all files from the floppy to the HDD
     Emulator_KeyboardSequence("COPY/SYS MZ0: WD0:\n");
-    Emulator_Run(1500);
+    Emulator_Run(1600);
     //Test_SaveScreenshot(_T("test09_11.bmp"));
 
     // Copy the bootloader
@@ -815,23 +819,24 @@ void Test10_ITO()
     Emulator_KeyboardSequence("1\n");
     Emulator_Run(375);  // Boot and wait for menu
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Conan" selected
-    Emulator_Run(550);
+    Emulator_Run(900);
     // Здесь была проблама: "Не загружается, сколько не жди, но передёргивание дисковода помогает"; исправилось в r397
     Test_CheckScreenshot(_T("data\\test10_05.bmp"));
     Emulator_KeyboardPressRelease(0153, 6);  // "Enter" on the title screen
     Emulator_Run(1000);
-    //NOTE: Тут непонятно -- не появляется надпись "Conan"
-    Test_SaveScreenshot(_T("test10_06.bmp"));
+    // Появляется надпись "Conan"
+    Test_CheckScreenshot(_T("data\\test10_06.bmp"));
+    //TODO: Зайти в игрушку
 
     Emulator_Reset();
 
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("1\n");
     Emulator_Run(375);  // Boot and wait for menu
-    Emulator_KeyboardPressRelease(0134);  // "Down arrow"
+    Emulator_KeyboardPressRelease(0134, 10);  // "Down arrow"
     Emulator_Run(3);
-    Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Sammy" selected
-    Emulator_Run(800);
+    Emulator_KeyboardPressRelease(0153, 6);  // "Enter" -- "Sammy" selected
+    Emulator_Run(975);
     // Здесь была проблама: "Не загружается, сколько не жди, но передёргивание дисковода помогает"; исправилось в r397
     Test_CheckScreenshot(_T("data\\test10_08.bmp"));
     Emulator_KeyboardPressReleaseChar(' ');  // "Space" on the title screen -- turns on "explosions"
@@ -850,7 +855,7 @@ void Test10_ITO()
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
     Emulator_Run(3);
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Knight" selected
-    Emulator_Run(500);
+    Emulator_Run(700);
     Test_CheckScreenshot(_T("data\\test10_10.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter" on the title screen
     Emulator_Run(75);
@@ -868,7 +873,7 @@ void Test10_ITO()
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
     Emulator_Run(3);
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Lode Runner" selected
-    Emulator_Run(650);
+    Emulator_Run(750);
     Test_CheckScreenshot(_T("data\\test10_12.bmp"));
     Emulator_KeyboardPressReleaseChar(' ');  // "Space" on the title screen
     Emulator_Run(450);
@@ -892,7 +897,7 @@ void Test10_ITO()
     Emulator_Run(225);
     Test_CheckScreenshot(_T("data\\test10_16.bmp"));  // Ready!
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- start the game
-    Emulator_Run(100);
+    Emulator_Run(99);
     Test_CheckScreenshot(_T("data\\test10_17.bmp"));
 
     Emulator_Reset();
@@ -903,7 +908,7 @@ void Test10_ITO()
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
     Emulator_Run(3);
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Arkanoid" selected
-    Emulator_Run(300);
+    Emulator_Run(350);
     Test_CheckScreenshot(_T("data\\test10_18.bmp"));
     Emulator_Run(350);
     Emulator_KeyboardPressReleaseChar(' ');
@@ -920,7 +925,7 @@ void Test10_ITO()
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
     Emulator_Run(3);
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Road Fighter" selected
-    Emulator_Run(550);
+    Emulator_Run(1000);
     Test_CheckScreenshot(_T("data\\test10_20.bmp"));
     Emulator_Run(350);
     Emulator_KeyboardPressReleaseChar(' ');
@@ -941,7 +946,7 @@ void Test11_SteelRat()
 
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("1\n");
-    Emulator_Run(15 * 25);
+    Emulator_Run(16 * 25);
     Test_CheckScreenshot(_T("data\\test11_01.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
     Emulator_Run(25);
@@ -977,7 +982,7 @@ void Test12_JEK()
     Emulator_KeyboardSequence("LE\n");
     Emulator_Run(15 * 25);
     // Здесь была проблама: "Не загружается, сколько не жди, но передёргивание дисковода помогает"; исправилось в r397
-    Emulator_Run(200);
+    Emulator_Run(250);
     // Полученное изображение отличается от изображения на реальной машине,
     // исправилось -- проверено на r482 с палитрой GRB
     Test_CheckScreenshot(_T("data\\test12_01.bmp"));
@@ -1052,7 +1057,7 @@ void Test15_VariousTS()
 
     // TEST SYSTEM V01.01 Трушин А. МНПП "Техноком", Зеленоград, 1992 г.
     Emulator_KeyboardSequence("RU MZ1:TS\n");
-    Emulator_Run(75);
+    Emulator_Run(125);
     Test_CheckScreenshot(_T("data\\test15_00.bmp"));
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
     Emulator_Run(3);
@@ -1122,7 +1127,7 @@ void Test15_VariousTS()
     Test_CreateDiskImage(_T("temp\\tempdisk.dsk"), 80);
     Test_AttachFloppyImage(0, _T("temp\\tempdisk.dsk"));
     Emulator_KeyboardPressRelease(0153, 10);  // "Enter" -- run the test
-    Emulator_Run(4075);
+    Emulator_Run(4197);
     Test_CheckScreenshot(_T("data\\test15_08b.bmp"));
     Emulator_Run(25);
 
@@ -1182,6 +1187,32 @@ void Test17_VariousOther()
     Emulator_KeyboardSequence("RU MZ1:IOSCPP\n");  // Run I/O port scanner
     Emulator_Run(50);
     Test_CheckScreenshot(_T("data\\test17_ioscan.bmp"));
+
+    Emulator_KeyboardSequence("RU MZ1:TSSPD\n");
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspd_1.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspd_2.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspd_3.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspd_4.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspd_5.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspd_6.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspd_7.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspd_8.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
 
     Test_Done();
 }

@@ -366,5 +366,10 @@ void Test_LoadStateImage(LPCTSTR sFileName)
         Test_LogFormat('E', _T("FAILED to load state image %s"), sFileName);
 }
 
+void Test_AssertFailed(LPCSTR sFileName, int nLine)
+{
+    Test_LogFormat('E', _T("ASSERT FAILED in %S at line %d"), sFileName, nLine);
+}
+
 
 //////////////////////////////////////////////////////////////////////
