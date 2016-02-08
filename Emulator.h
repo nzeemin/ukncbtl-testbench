@@ -20,17 +20,17 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 
 extern CMotherboard* g_pBoard;
 
-extern BOOL g_okEmulatorRunning;
+extern bool g_okEmulatorRunning;
 
 
 //////////////////////////////////////////////////////////////////////
 
 
-BOOL Emulator_Init();
+bool Emulator_Init();
 void Emulator_Done();
 void Emulator_SetCPUBreakpoint(WORD address);
 void Emulator_SetPPUBreakpoint(WORD address);
-BOOL Emulator_IsBreakpoint();
+bool Emulator_IsBreakpoint();
 void Emulator_Start();
 void Emulator_Stop();
 void Emulator_Reset();
@@ -39,17 +39,17 @@ DWORD Emulator_GetUptime();  // UKNC uptime, in seconds
 
 void Emulator_PrepareScreenRGB32(void* pBits, const DWORD* colors);
 
-BOOL Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath);
-BOOL Emulator_AttachFloppyImage(int slot, LPCTSTR sFilePath);
-BOOL Emulator_AttachHardImage(int slot, LPCTSTR sFilePath);
+bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath);
+bool Emulator_AttachFloppyImage(int slot, LPCTSTR sFilePath);
+bool Emulator_AttachHardImage(int slot, LPCTSTR sFilePath);
 
-BOOL Emulator_OpenTape(LPCTSTR sFilePath);
-BOOL Emulator_CreateTape(LPCTSTR sFilePath);
+bool Emulator_OpenTape(LPCTSTR sFilePath);
+bool Emulator_CreateTape(LPCTSTR sFilePath);
 void Emulator_CloseTape();
 
-BOOL Emulator_Run(int frames);
-BOOL Emulator_SaveScreenshot(LPCTSTR sFileName);
-BOOL Emulator_SaveApngFrame(HAPNGFILE hFile);
+bool Emulator_Run(int frames);
+bool Emulator_SaveScreenshot(LPCTSTR sFileName);
+bool Emulator_SaveApngFrame(HAPNGFILE hFile);
 int  Emulator_CheckScreenshot(LPCTSTR sFileName);
 void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout = 3);
 void Emulator_KeyboardPressReleaseChar(char ch, int timeout = 3);
@@ -58,8 +58,8 @@ void Emulator_KeyboardPressReleaseShift(BYTE ukncscan);
 void Emulator_KeyboardPressReleaseAlt(BYTE ukncscan);
 void Emulator_KeyboardPressReleaseCtrl(BYTE ukncscan);
 
-BOOL Emulator_SaveImage(LPCTSTR sFilePath);
-BOOL Emulator_LoadImage(LPCTSTR sFilePath);
+bool Emulator_SaveImage(LPCTSTR sFilePath);
+bool Emulator_LoadImage(LPCTSTR sFilePath);
 
 
 //////////////////////////////////////////////////////////////////////

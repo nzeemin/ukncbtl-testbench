@@ -87,7 +87,7 @@ void Test2_Basic()
     Emulator_SetCPUBreakpoint(000000);
     Test_Assert(!Emulator_Run(5));
     Test_Assert(g_pBoard->GetCPU()->GetPC() == 000000);
-    BOOL bValid;
+    bool bValid;
     Test_Assert(g_pBoard->GetCPUMemoryController()->GetWordView(000000, FALSE, TRUE, &bValid) == 0240)
     Emulator_SetCPUBreakpoint(0177777);
 
