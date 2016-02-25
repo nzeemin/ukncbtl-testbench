@@ -623,19 +623,6 @@ bool Emulator_SaveScreenshot(LPCTSTR sFileName)
     return result;
 }
 
-bool Emulator_SaveApngFrame(HAPNGFILE hFile)
-{
-    DWORD * bits = (DWORD *) ::malloc(640 * 288 * 4);
-
-    Emulator_PrepareScreenRGB32(bits, ScreenView_StandardRGBColors);
-
-    bool result = ApngFile_WriteFrame(hFile, bits, ScreenView_StandardRGBColors);
-
-    ::free(bits);
-
-    return result;
-}
-
 
 // Returns: amount of different pixels
 int Emulator_CompareScreens(const DWORD * scr1, const DWORD * scr2)

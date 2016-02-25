@@ -49,7 +49,6 @@ void Emulator_CloseTape();
 
 bool Emulator_Run(int frames);
 bool Emulator_SaveScreenshot(LPCTSTR sFileName);
-bool Emulator_SaveApngFrame(HAPNGFILE hFile);
 int  Emulator_CheckScreenshot(LPCTSTR sFileName);
 void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout = 3);
 void Emulator_KeyboardPressReleaseChar(char ch, int timeout = 3);

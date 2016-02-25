@@ -24,14 +24,14 @@ int m_nCommon_TestsFailed = 0;
 
 //////////////////////////////////////////////////////////////////////
 
-BOOL AssertFailedLine(LPCSTR lpszFileName, int nLine)
+bool AssertFailedLine(LPCSTR /*lpszFileName*/, int /*nLine*/)
 {
     //TODO: Implement in this environment
 
     return FALSE;
 }
 
-void AlertWarning(LPCTSTR sMessage)
+void AlertWarning(LPCTSTR /*sMessage*/)
 {
     //TODO: Implement in this environment
 }
@@ -124,7 +124,7 @@ void PrintOctalValue(TCHAR* buffer, WORD value)
 {
     for (int p = 0; p < 6; p++) {
         int digit = value & 7;
-        buffer[5 - p] = _T('0') + digit;
+        buffer[5 - p] = _T('0') + (TCHAR)digit;
         value = (value >> 3);
     }
     buffer[6] = 0;
@@ -135,7 +135,7 @@ void PrintHexValue(TCHAR* buffer, WORD value)
 {
     for (int p = 0; p < 4; p++) {
         int digit = value & 15;
-        buffer[3 - p] = (digit < 10) ? _T('0') + digit : _T('a') + digit - 10;
+		buffer[3 - p] = (digit < 10) ? _T('0') + (TCHAR)digit : _T('a') + (TCHAR)digit - 10;
         value = (value >> 4);
     }
     buffer[4] = 0;
@@ -293,17 +293,6 @@ void Test_SaveScreenshotSeria(LPCTSTR sFileNameTemplate, int count, int frameSte
         Test_SaveScreenshot(buffer);
         Emulator_Run(frameStep);
     }
-}
-
-void Test_SaveAnimatedScreenshot(LPCTSTR sFileName, int count, int frameStep)
-{
-    HAPNGFILE hFile = ApngFile_Create(sFileName);
-    for (int i = 0; i < count; i++)
-    {
-        Emulator_SaveApngFrame(hFile);
-        Emulator_Run(frameStep);
-    }
-    ApngFile_Close(hFile);
 }
 
 void Test_CheckScreenshot(LPCTSTR sFileName)

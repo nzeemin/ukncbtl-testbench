@@ -1217,7 +1217,7 @@ void Test17_VariousOther()
     Test_Done();
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
     Test_LogInfo(_T("Initialization..."));
