@@ -48,6 +48,7 @@ bool Emulator_CreateTape(LPCTSTR sFilePath);
 void Emulator_CloseTape();
 
 bool Emulator_Run(int frames);
+bool Emulator_RunUntilMotorOff();
 bool Emulator_SaveScreenshot(LPCTSTR sFileName);
 int  Emulator_CheckScreenshot(LPCTSTR sFileName);
 void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout = 3);

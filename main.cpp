@@ -25,7 +25,7 @@ void ListBusDevices(const CBusDevice** pDevices)
         {
             WORD start = *pRanges;  pRanges++;
             WORD length = *pRanges;  pRanges++;
-            Test_LogFormat('i', _T("    %06o-%06o"), start, start+length-1);
+            Test_LogFormat('i', _T("    %06o-%06o"), start, start + length - 1);
         }
         pDevices++;
     }
@@ -426,7 +426,7 @@ void Test4_Games()
     Emulator_KeyboardSequence("1\n");  // Level (1..10)?
     Emulator_Run(20);
     Test_CheckScreenshot(_T("data\\test04_21.bmp"));
-    
+
     Emulator_Reset();
 
     Emulator_Run(75);  // Boot: 3 seconds
@@ -435,15 +435,15 @@ void Test4_Games()
     Emulator_KeyboardSequence("01-01-99\n\n\n");
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("RU MZ1:SAPER\n");
-    Emulator_Run(33*25);
+    Emulator_Run(33 * 25);
     Test_CheckScreenshot(_T("data\\test04_22.bmp"));
     Emulator_KeyboardPressReleaseChar(' ');
-    Emulator_Run(6*25);
+    Emulator_Run(6 * 25);
     Test_CheckScreenshot(_T("data\\test04_23.bmp"));
     Emulator_KeyboardPressReleaseChar(' ');
-    Emulator_Run(5*25);
+    Emulator_Run(5 * 25);
     Test_CheckScreenshot(_T("data\\test04_24.bmp"));
-    
+
     //Test_SaveScreenshotSeria(_T("video\\test4_%04u.bmp"), 60, 25);
 
     Test_Done();
@@ -463,7 +463,7 @@ void Test5_Disks()
     Emulator_Run(200);  // Boot: 8 seconds
     Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
     Emulator_Run(75);  // Boot: 3 seconds
-    
+
     Emulator_KeyboardSequence("SHOW CONF\n");
     Emulator_Run(150);
     Test_CheckScreenshot(_T("data\\test05_0.bmp"));

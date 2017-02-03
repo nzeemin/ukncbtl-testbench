@@ -7,3 +7,8 @@
 /emubase
 /temp
 /*.bin
+/video/*
+/*.sdf
+/*.opensdf
+/ipch
+/data/*.lst

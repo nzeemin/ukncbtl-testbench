@@ -52,7 +52,8 @@ bool CALLBACK Emulator_TapeReadCallback(UINT samples);
 bool CALLBACK Emulator_TapeWriteCallback(UINT samples);
 
 
-const DWORD ScreenView_StandardRGBColors[16*8] = {
+const DWORD ScreenView_StandardRGBColors[16 * 8] =
+{
     0x000000, 0x000080, 0x008000, 0x008080, 0x800000, 0x800080, 0x808000, 0x808080,
     0x000000, 0x0000FF, 0x00FF00, 0x00FFFF, 0xFF0000, 0xFF00FF, 0xFFFF00, 0xFFFFFF,
     0x000000, 0x000060, 0x008000, 0x008060, 0x800000, 0x800060, 0x808000, 0x808060,
@@ -221,7 +222,7 @@ int Emulator_SystemFrame()
     g_pBoard->SetPPUBreakpoint(m_wEmulatorPPUBreakpoint);
 
     //ScreenView_ScanKeyboard();
-    
+
     if (!g_pBoard->SystemFrame())
         return 0;
 
@@ -277,6 +278,19 @@ bool Emulator_Run(int frames)
     return true;
 }
 
+bool Emulator_RunUntilMotorOff()
+{
+    for (;;)
+    {
+        int res = Emulator_SystemFrame();
+        if (!res)
+            return false;
+        if (!g_pBoard->IsFloppyEngineOn())
+            break;
+    }
+    return true;
+}
+
 bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 {
     // Open file
@@ -319,19 +333,19 @@ bool Emulator_AttachHardImage(int slot, LPCTSTR sFilePath)
 //   result     Bit to put in tape input port.
 bool CALLBACK Emulator_TapeReadCallback(unsigned int samples)
 {
-	if (samples == 0) return 0;
+    if (samples == 0) return 0;
 
     // Scroll buffer
     memmove(m_TapeBuffer, m_TapeBuffer + samples, TAPE_BUFFER_SIZE - samples);
 
-	UINT value = 0;
-	for (UINT i = 0; i < samples; i++)
-	{
-		value = WavPcmFile_ReadOne(m_hTapeWavPcmFile);
+    UINT value = 0;
+    for (UINT i = 0; i < samples; i++)
+    {
+        value = WavPcmFile_ReadOne(m_hTapeWavPcmFile);
         *(m_TapeBuffer + TAPE_BUFFER_SIZE - samples + i) = (BYTE)((value >> 24) & 0xff);
-	}
-	bool result = (value >= UINT_MAX / 2);
-	return result;
+    }
+    bool result = (value >= UINT_MAX / 2);
+    return result;
 }
 
 void CALLBACK Emulator_TapeWriteCallback(int value, UINT samples)
@@ -352,9 +366,9 @@ void CALLBACK Emulator_TapeWriteCallback(int value, UINT samples)
 
 bool Emulator_OpenTape(LPCTSTR sFilePath)
 {
-	m_hTapeWavPcmFile = WavPcmFile_Open(sFilePath);
-	if (m_hTapeWavPcmFile == INVALID_HANDLE_VALUE)
-		return false;
+    m_hTapeWavPcmFile = WavPcmFile_Open(sFilePath);
+    if (m_hTapeWavPcmFile == INVALID_HANDLE_VALUE)
+        return false;
 
     int sampleRate = WavPcmFile_GetFrequency(m_hTapeWavPcmFile);
     g_pBoard->SetTapeReadCallback(Emulator_TapeReadCallback, sampleRate);
@@ -364,9 +378,9 @@ bool Emulator_OpenTape(LPCTSTR sFilePath)
 
 bool Emulator_CreateTape(LPCTSTR sFilePath)
 {
-	m_hTapeWavPcmFile = WavPcmFile_Create(sFilePath, 22050);
-	if (m_hTapeWavPcmFile == INVALID_HANDLE_VALUE)
-		return false;
+    m_hTapeWavPcmFile = WavPcmFile_Create(sFilePath, 22050);
+    if (m_hTapeWavPcmFile == INVALID_HANDLE_VALUE)
+        return false;
 
     int sampleRate = WavPcmFile_GetFrequency(m_hTapeWavPcmFile);
     g_pBoard->SetTapeWriteCallback(Emulator_TapeWriteCallback, sampleRate);
@@ -380,7 +394,7 @@ void Emulator_CloseTape()
     g_pBoard->SetTapeWriteCallback(NULL, 0);
 
     WavPcmFile_Close(m_hTapeWavPcmFile);
-	m_hTapeWavPcmFile = (HWAVPCMFILE) INVALID_HANDLE_VALUE;
+    m_hTapeWavPcmFile = (HWAVPCMFILE) INVALID_HANDLE_VALUE;
 }
 
 void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
@@ -403,7 +417,8 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
     BYTE pbpgpr = 0;         // 3-bit Y-value modifier
     for (int yy = 0; yy < 307; yy++)
     {
-        if (okTagSize) {  // 4-word tag
+        if (okTagSize)    // 4-word tag
+        {
             WORD tag1 = g_pBoard->GetRAMWord(0, address);
             address += 2;
             WORD tag2 = g_pBoard->GetRAMWord(0, address);
@@ -419,7 +434,7 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
                 pbpgpr = (BYTE)((7 - (tag2 & 7)) << 4);  // Y-value modifier
                 cursorYRGB = (BYTE)(tag1 & 15);  // Cursor color
                 okCursorType = ((tag1 & 16) != 0);  // true - graphical cursor, false - symbolic cursor
-                ASSERT(okCursorType==0);  //DEBUG
+                ASSERT(okCursorType == 0); //DEBUG
                 cursorPos = (BYTE)(((tag1 >> 8) >> scale) & 0x7f);  // Cursor position in the line
                 cursorAddress = (BYTE)((tag1 >> 5) & 7);
                 scale = 1 << scale;
@@ -475,11 +490,11 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
                     if (cursorOn && (pos == cursorPos) && (!okCursorType || (okCursorType && bit == cursorAddress)))
                         valueRGB = colors[cursorYRGB];  // 4-bit to 32-bit color
                     else
-					{
-	                    // Make 3-bit value from the bits
-						BYTE value012 = (src0 & 1) | ((src1 & 1) << 1) | ((src2 & 1) << 2);
+                    {
+                        // Make 3-bit value from the bits
+                        BYTE value012 = (src0 & 1) | ((src1 & 1) << 1) | ((src2 & 1) << 2);
                         valueRGB = palettecurrent[value012];  // 3-bit to 32-bit color
-					}
+                    }
 
                     // Put value to m_bits; repeat using scale value
                     switch (scale)
@@ -719,50 +734,52 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName)
 
 void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout)
 {
-	g_pBoard->KeyboardEvent(ukncscan, true);
+    g_pBoard->KeyboardEvent(ukncscan, true);
     Emulator_Run(timeout);
-	g_pBoard->KeyboardEvent(ukncscan, false);
+    g_pBoard->KeyboardEvent(ukncscan, false);
     Emulator_Run(3);
 }
 
-const BYTE arrChar2UkncScan[256] = {
-/*       0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f  */
-/*0*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0153, 0000, 0000, 0153, 0000, 0000, 
-/*1*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*2*/    0113, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0117, 0175, 0146, 0173, 
-/*3*/    0176, 0030, 0031, 0032, 0013, 0034, 0035, 0016, 0017, 0177, 0174, 0007, 0000, 0000, 0000, 0000, 
-/*4*/    0077, 0072, 0076, 0050, 0057, 0033, 0047, 0055, 0156, 0073, 0027, 0052, 0056, 0112, 0054, 0075, 
-/*5*/    0053, 0067, 0074, 0111, 0114, 0051, 0137, 0071, 0115, 0070, 0157, 0036, 0136, 0037, 0110, 0155, 
-/*6*/    0126, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*7*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0155, 0000, 0000, 0000, 0000, 
-/*8*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*9*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*a*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*b*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*c*/    0007, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*d*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*e*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*f*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
+const BYTE arrChar2UkncScan[256] =
+{
+    /*       0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f  */
+    /*0*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0153, 0000, 0000, 0153, 0000, 0000,
+    /*1*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*2*/    0113, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0117, 0175, 0146, 0173,
+    /*3*/    0176, 0030, 0031, 0032, 0013, 0034, 0035, 0016, 0017, 0177, 0174, 0007, 0000, 0000, 0000, 0000,
+    /*4*/    0077, 0072, 0076, 0050, 0057, 0033, 0047, 0055, 0156, 0073, 0027, 0052, 0056, 0112, 0054, 0075,
+    /*5*/    0053, 0067, 0074, 0111, 0114, 0051, 0137, 0071, 0115, 0070, 0157, 0036, 0136, 0037, 0110, 0155,
+    /*6*/    0126, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*7*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0155, 0000, 0000, 0000, 0000,
+    /*8*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*9*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*a*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*b*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*c*/    0007, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*d*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*e*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*f*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
 };
 
-const BYTE arrChar2UkncScanShift[256] = {
-/*       0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f  */
-/*0*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*1*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*2*/    0000, 0030, 0031, 0032, 0013, 0034, 0035, 0016, 0017, 0177, 0174, 0007, 0000, 0000, 0000, 0000, 
-/*3*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0117, 0175, 0135, 0173,
-/*4*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*5*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*6*/    0077, 0072, 0076, 0050, 0057, 0033, 0047, 0055, 0156, 0073, 0027, 0052, 0056, 0112, 0054, 0075, 
-/*7*/    0053, 0067, 0074, 0111, 0114, 0051, 0137, 0071, 0115, 0070, 0157, 0036, 0136, 0037, 0110, 0000, 
-/*8*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*9*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*a*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*b*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*c*/    0007, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*d*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*e*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
-/*f*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 
+const BYTE arrChar2UkncScanShift[256] =
+{
+    /*       0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f  */
+    /*0*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*1*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*2*/    0000, 0030, 0031, 0032, 0013, 0034, 0035, 0016, 0017, 0177, 0174, 0007, 0000, 0000, 0000, 0000,
+    /*3*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0117, 0175, 0135, 0173,
+    /*4*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*5*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*6*/    0077, 0072, 0076, 0050, 0057, 0033, 0047, 0055, 0156, 0073, 0027, 0052, 0056, 0112, 0054, 0075,
+    /*7*/    0053, 0067, 0074, 0111, 0114, 0051, 0137, 0071, 0115, 0070, 0157, 0036, 0136, 0037, 0110, 0000,
+    /*8*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*9*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*a*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*b*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*c*/    0007, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*d*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*e*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
+    /*f*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
 };
 
 void Emulator_KeyboardPressReleaseChar(char ch, int timeout)
@@ -792,37 +809,37 @@ void Emulator_KeyboardSequence(const char * str)
 
 void Emulator_KeyboardPressReleaseShift(BYTE ukncscan)
 {
-	g_pBoard->KeyboardEvent(0105, true);
+    g_pBoard->KeyboardEvent(0105, true);
     Emulator_Run(3);
-	g_pBoard->KeyboardEvent(ukncscan, true);
+    g_pBoard->KeyboardEvent(ukncscan, true);
     Emulator_Run(3);
-	g_pBoard->KeyboardEvent(ukncscan, false);
+    g_pBoard->KeyboardEvent(ukncscan, false);
     Emulator_Run(3);
-	g_pBoard->KeyboardEvent(0105, false);
+    g_pBoard->KeyboardEvent(0105, false);
     Emulator_Run(3);
 }
 
 void Emulator_KeyboardPressReleaseAlt(BYTE ukncscan)
 {
-	g_pBoard->KeyboardEvent(0107, true);
+    g_pBoard->KeyboardEvent(0107, true);
     Emulator_Run(3);
-	g_pBoard->KeyboardEvent(ukncscan, true);
+    g_pBoard->KeyboardEvent(ukncscan, true);
     Emulator_Run(3);
-	g_pBoard->KeyboardEvent(ukncscan, false);
+    g_pBoard->KeyboardEvent(ukncscan, false);
     Emulator_Run(3);
-	g_pBoard->KeyboardEvent(0107, false);
+    g_pBoard->KeyboardEvent(0107, false);
     Emulator_Run(3);
 }
 
 void Emulator_KeyboardPressReleaseCtrl(BYTE ukncscan)
 {
-	g_pBoard->KeyboardEvent(046, true);
+    g_pBoard->KeyboardEvent(046, true);
     Emulator_Run(3);
-	g_pBoard->KeyboardEvent(ukncscan, true);
+    g_pBoard->KeyboardEvent(ukncscan, true);
     Emulator_Run(3);
-	g_pBoard->KeyboardEvent(ukncscan, false);
+    g_pBoard->KeyboardEvent(ukncscan, false);
     Emulator_Run(3);
-	g_pBoard->KeyboardEvent(046, false);
+    g_pBoard->KeyboardEvent(046, false);
     Emulator_Run(3);
 }
 
@@ -874,7 +891,7 @@ bool Emulator_LoadImage(LPCTSTR sFilePath)
     DWORD bufHeader[UKNCIMAGE_HEADER_SIZE / sizeof(DWORD)];
     size_t dwBytesRead = ::fread(bufHeader, 1, UKNCIMAGE_HEADER_SIZE, fpFile);
     //TODO: Check if dwBytesRead != UKNCIMAGE_HEADER_SIZE
-    
+
     //TODO: Check version and size
 
     // Allocate memory
