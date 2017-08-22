@@ -498,6 +498,54 @@ void Test5_Disks()
     Test_Done();
 }
 
+void Test52_Disk_TESTMZ()
+{
+    Test_Init(_T("TEST 5.2: TESTMZ"));
+
+    Test_CopyFile(_T("data\\disk1.dsk"), _T("temp\\disk1.dsk"));
+    Test_CreateDiskImage(_T("temp\\temp052.dsk"), 80);
+    Test_AttachFloppyImage(0, _T("temp\\disk1.dsk"));
+    Test_AttachFloppyImage(1, _T("temp\\temp052.dsk"));
+
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("1\n");
+    Emulator_Run(200);  // Boot: 8 seconds
+    Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
+    Emulator_Run(75);  // Boot: 3 seconds
+
+    Emulator_KeyboardSequence("TESTMZ\n");
+    Emulator_Run(150);
+    Test_CheckScreenshot(_T("data\\test052_0.bmp"));
+
+    Emulator_KeyboardPressRelease(0134, 10);  // "Down arrow"
+    Emulator_KeyboardSequence("\n");   // Select "ФОРМАТИРОВАНИЕ"
+    Emulator_KeyboardSequence("1\n");  // Select MZ1:
+    Emulator_KeyboardSequence("N\n");  // "РАЗМЕТКА СТАНДАРТНАЯ?" Нет
+    Emulator_KeyboardSequence("\n");   // "ДОРОЖКИ ОТ 0"
+    Emulator_KeyboardSequence("79\n"); // "ДО 39"
+    Emulator_KeyboardSequence("\n");   // "СТОРОНА"
+    Emulator_KeyboardSequence("\n");   // "СЕКТОР"
+    Emulator_KeyboardSequence("\n");   // "КОД-БАЙТ"
+    Test_CheckScreenshot(_T("data\\test052_1.bmp"));
+    Emulator_Run(43 * 75 + 8 * 25);  // Formatting
+    Test_CheckScreenshot(_T("data\\test052_2.bmp"));
+    Emulator_KeyboardSequence("K\n");  // Exit to main menu
+
+    //NOTE: Функциональный тест -- мотор останавливается до окончания 1-го прохода
+    //Emulator_Run(75);
+    //Emulator_KeyboardPressRelease(0134, 10);  // "Down arrow"
+    //Emulator_KeyboardPressRelease(0134, 10);  // "Down arrow"
+    //Emulator_KeyboardPressRelease(0134, 10);  // "Down arrow"
+    //Emulator_KeyboardPressRelease(0134, 10);  // "Down arrow"
+    //Test_SaveScreenshot(_T("test052_3.bmp"));
+    //Emulator_KeyboardSequence("\n");  // Select "ФУНКЦИОНАЛЬНЫЙ ТЕСТ"
+
+    //Test_SaveScreenshot(_T("test052_4.bmp"));
+    //Emulator_RunUntilMotorOff();
+    //Test_SaveScreenshot(_T("test052_5.bmp"));
+    //Test_SaveScreenshotSeria(_T("video\\test052_%04u.bmp"), 60, 300);
+}
+
 void Test6_TurboBasic()
 {
     Test_Init(_T("TEST 6: Turbo Basic"));
@@ -1228,6 +1276,7 @@ int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
     Test3_FODOSTM1();
     Test4_Games();
     Test5_Disks();
+    Test52_Disk_TESTMZ();
     Test6_TurboBasic();
     Test7_TapeRead();
     Test8_GD();

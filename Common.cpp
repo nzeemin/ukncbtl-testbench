@@ -336,8 +336,8 @@ void Test_CreateDiskImage(LPCTSTR sFileName, int tracks)
             GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (hFile == INVALID_HANDLE_VALUE)
     {
-        Test_LogFormat('E', _T("FAILED to create disk image %s"), sFileName);
-        return;
+        Test_LogFormat('E', _T("FAILED to create disk image %s (%ld)"), sFileName, GetLastError());
+        exit(1);
     }
 
     // Zero-fill the file
