@@ -87,8 +87,8 @@ void Test2_Basic()
     Emulator_SetCPUBreakpoint(000000);
     Test_Assert(!Emulator_Run(5));
     Test_Assert(g_pBoard->GetCPU()->GetPC() == 000000);
-    bool bValid;
-    Test_Assert(g_pBoard->GetCPUMemoryController()->GetWordView(000000, FALSE, TRUE, &bValid) == 0240)
+    int nAddrType;
+    Test_Assert(g_pBoard->GetCPUMemoryController()->GetWordView(000000, FALSE, TRUE, &nAddrType) == 0240)
     Emulator_SetCPUBreakpoint(0177777);
 
     Emulator_Run(95);  // Boot BASIC: 5 seconds
