@@ -213,11 +213,13 @@ void Test_Done()
         m_nCommon_TestsFailed++;
 }
 
-void Test_LogSummary()
+BOOL Test_LogSummary()
 {
     Test_LogFormat('i', _T("Emulator time spent: %u seconds"), m_dwTotalEmulatorUptime);
     char evtype = (m_nCommon_TestsFailed == 0) ? '!' : 'E';
     Test_LogFormat(evtype, _T("TOTAL tests started: %u, failed: %u"), m_nCommon_TestsStarted, m_nCommon_TestsFailed);
+
+    return (m_nCommon_TestsFailed == 0);
 }
 
 void Test_LoadROMCartridge(int slot, LPCTSTR sFilePath)

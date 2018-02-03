@@ -1311,7 +1311,7 @@ int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
     float diff = (float)ulDiff;  // number of 100-nanosecond intervals
     Test_LogFormat('i', _T("Time spent: %.3f seconds"), diff / 10000000.0);
 
-    Test_LogSummary();
+    BOOL result = Test_LogSummary();
 
-    return 0;
+    return result ? 0 : 10;
 }

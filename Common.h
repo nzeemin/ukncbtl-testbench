@@ -73,7 +73,7 @@ inline void Test_LogError(LPCTSTR message) { Test_Log('E', message); }
 
 void Test_Init(LPCTSTR sTestTitle);
 void Test_Done();
-void Test_LogSummary();
+BOOL Test_LogSummary();
 
 void Test_LoadROMCartridge(int slot, LPCTSTR sFilePath);
 void Test_AttachFloppyImage(int slot, LPCTSTR sFilePath);
