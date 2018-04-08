@@ -1262,6 +1262,14 @@ void Test17_VariousOther()
     Test_SaveScreenshot(_T("test17_tsspd_8.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
 
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:IRQ\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+
+    Test_SaveScreenshot(_T("test17_irq_1.bmp"));
+
     Test_Done();
 }
 
