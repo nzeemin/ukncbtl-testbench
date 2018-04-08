@@ -24,13 +24,13 @@ UKNCBTL. If not, see <http://www.gnu.org/licenses/>. */
 //////////////////////////////////////////////////////////////////////
 
 
-CMotherboard* g_pBoard = NULL;
+CMotherboard* g_pBoard = nullptr;
 
 bool g_okEmulatorInitialized = false;
 bool g_okEmulatorRunning = false;
 
-WORD m_wEmulatorCPUBreakpoint = 0177777;
-WORD m_wEmulatorPPUBreakpoint = 0177777;
+uint16_t m_wEmulatorCPUBreakpoint = 0177777;
+uint16_t m_wEmulatorPPUBreakpoint = 0177777;
 
 //bool m_okEmulatorSound = false;
 
@@ -38,21 +38,21 @@ WORD m_wEmulatorPPUBreakpoint = 0177777;
 //HANDLE m_hEmulatorComPort = INVALID_HANDLE_VALUE;
 
 //bool m_okEmulatorParallel = false;
-//FILE* m_fpEmulatorParallelOut = NULL;
+//FILE* m_fpEmulatorParallelOut = nullptr;
 
 //long m_nFrameCount = 0;
-DWORD m_dwTickCount = 0;
-DWORD m_dwEmulatorUptime = 0;  // UKNC uptime, seconds, from turn on or reset, increments every 25 frames
+uint32_t m_dwTickCount = 0;
+uint32_t m_dwEmulatorUptime = 0;  // UKNC uptime, seconds, from turn on or reset, increments every 25 frames
 long m_nUptimeFrameCount = 0;
 
 HWAVPCMFILE m_hTapeWavPcmFile = (HWAVPCMFILE) INVALID_HANDLE_VALUE;
 #define TAPE_BUFFER_SIZE 624
-BYTE m_TapeBuffer[TAPE_BUFFER_SIZE];
+uint8_t m_TapeBuffer[TAPE_BUFFER_SIZE];
 bool CALLBACK Emulator_TapeReadCallback(UINT samples);
 bool CALLBACK Emulator_TapeWriteCallback(UINT samples);
 
 
-const DWORD ScreenView_StandardRGBColors[16 * 8] =
+const uint32_t ScreenView_StandardRGBColors[16 * 8] =
 {
     0x000000, 0x000080, 0x008000, 0x008080, 0x800000, 0x800080, 0x808000, 0x808080,
     0x000000, 0x0000FF, 0x00FF00, 0x00FFFF, 0xFF0000, 0xFF00FF, 0xFFFF00, 0xFFFFFF,
@@ -80,21 +80,21 @@ const LPCTSTR FILE_NAME_UKNC_ROM = _T("uknc_rom.bin");
 
 bool Emulator_Init()
 {
-    ASSERT(g_pBoard == NULL);
+    ASSERT(g_pBoard == nullptr);
 
     CProcessor::Init();
 
     g_pBoard = new CMotherboard();
 
-    BYTE buffer[32768];
+    uint8_t buffer[32768];
     size_t dwBytesRead;
 
     // Load ROM file
     memset(buffer, 0, 32768);
     FILE* fpRomFile = ::_tfsopen(FILE_NAME_UKNC_ROM, _T("rb"), _SH_DENYWR);
-    if (fpRomFile == NULL)
+    if (fpRomFile == nullptr)
     {
-        AlertWarning(_T("Failed to load ROM file."));
+        AlertWarning(_T("Failed to load UKNC ROM image."));
         return false;
     }
     dwBytesRead = ::fread(buffer, 1, 32256, fpRomFile);
@@ -117,8 +117,8 @@ bool Emulator_Init()
     //// Allocate memory for old RAM values
     //for (int i = 0; i < 3; i++)
     //{
-    //    g_pEmulatorRam[i] = (BYTE*) ::malloc(65536);  memset(g_pEmulatorRam[i], 0, 65536);
-    //    g_pEmulatorChangedRam[i] = (BYTE*) ::malloc(65536);  memset(g_pEmulatorChangedRam[i], 0, 65536);
+    //    g_pEmulatorRam[i] = (uint8_t*) ::malloc(65536);  memset(g_pEmulatorRam[i], 0, 65536);
+    //    g_pEmulatorChangedRam[i] = (uint8_t*) ::malloc(65536);  memset(g_pEmulatorChangedRam[i], 0, 65536);
     //}
 
     g_okEmulatorInitialized = true;
@@ -127,14 +127,14 @@ bool Emulator_Init()
 
 void Emulator_Done()
 {
-    ASSERT(g_pBoard != NULL);
+    ASSERT(g_pBoard != nullptr);
 
     CProcessor::Done();
 
-    //g_pBoard->SetSoundGenCallback(NULL);
+    //g_pBoard->SetSoundGenCallback(nullptr);
     //SoundGen_Finalize();
 
-    //g_pBoard->SetSerialCallbacks(NULL, NULL);
+    //g_pBoard->SetSerialCallbacks(nullptr, nullptr);
     //if (m_hEmulatorComPort != INVALID_HANDLE_VALUE)
     //{
     //    ::CloseHandle(m_hEmulatorComPort);
@@ -142,7 +142,7 @@ void Emulator_Done()
     //}
 
     delete g_pBoard;
-    g_pBoard = NULL;
+    g_pBoard = nullptr;
 
     //// Free memory used for old RAM values
     //for (int i = 0; i < 3; i++)
@@ -171,21 +171,21 @@ void Emulator_Stop()
     m_wEmulatorCPUBreakpoint = 0177777;
     m_wEmulatorPPUBreakpoint = 0177777;
 
-    //if (m_fpEmulatorParallelOut != NULL)
+    //if (m_fpEmulatorParallelOut != nullptr)
     //    ::fflush(m_fpEmulatorParallelOut);
 
     //// Reset title bar message
     //SetWindowText(g_hwnd, _T("UKNC Back to Life [stop]"));
     //MainWindow_UpdateMenu();
     //// Reset FPS indicator
-    //MainWindow_SetStatusbarText(StatusbarPartFPS, _T(""));
+    //MainWindow_SetStatusbarText(StatusbarPartFPS, nullptr);
 
     //MainWindow_UpdateAllViews();
 }
 
 void Emulator_Reset()
 {
-    ASSERT(g_pBoard != NULL);
+    ASSERT(g_pBoard != nullptr);
 
     g_pBoard->Reset();
 
@@ -195,52 +195,33 @@ void Emulator_Reset()
     //MainWindow_UpdateAllViews();
 }
 
-void Emulator_SetCPUBreakpoint(WORD address)
+void Emulator_SetCPUBreakpoint(uint16_t address)
 {
     m_wEmulatorCPUBreakpoint = address;
 }
-void Emulator_SetPPUBreakpoint(WORD address)
+void Emulator_SetPPUBreakpoint(uint16_t address)
 {
     m_wEmulatorPPUBreakpoint = address;
 }
 bool Emulator_IsBreakpoint()
 {
-    WORD wCPUAddr = g_pBoard->GetCPU()->GetPC();
+    uint16_t wCPUAddr = g_pBoard->GetCPU()->GetPC();
     if (wCPUAddr == m_wEmulatorCPUBreakpoint)
         return true;
-    WORD wPPUAddr = g_pBoard->GetPPU()->GetPC();
+    uint16_t wPPUAddr = g_pBoard->GetPPU()->GetPC();
     if (wPPUAddr == m_wEmulatorPPUBreakpoint)
         return true;
     return false;
 }
 
-int Emulator_SystemFrame()
+bool Emulator_SystemFrame()
 {
     //SoundGen_SetVolume(Settings_GetSoundVolume());
 
     g_pBoard->SetCPUBreakpoint(m_wEmulatorCPUBreakpoint);
     g_pBoard->SetPPUBreakpoint(m_wEmulatorPPUBreakpoint);
 
-    //ScreenView_ScanKeyboard();
-
-    if (!g_pBoard->SystemFrame())
-        return 0;
-
-    //// Calculate frames per second
-    //m_nFrameCount++;
-    //DWORD dwCurrentTicks = GetTickCount();
-    //long nTicksElapsed = dwCurrentTicks - m_dwTickCount;
-    //if (nTicksElapsed >= 1200)
-    //{
-    //    double dFramesPerSecond = m_nFrameCount * 1000.0 / nTicksElapsed;
-    //    double dSpeed = dFramesPerSecond / 25.0 * 100;
-    //    TCHAR buffer[16];
-    //    _stprintf(buffer, _T("%03.f%%"), dSpeed);
-    //    MainWindow_SetStatusbarText(StatusbarPartFPS, buffer);
-
-    //    m_nFrameCount = 0;
-    //    m_dwTickCount = dwCurrentTicks;
-    //}
+    g_pBoard->SystemFrame();
 
     // Calculate emulator uptime (25 frames per second)
     m_nUptimeFrameCount++;
@@ -248,20 +229,12 @@ int Emulator_SystemFrame()
     {
         m_dwEmulatorUptime++;
         m_nUptimeFrameCount = 0;
-
-        //int seconds = (int) (m_dwEmulatorUptime % 60);
-        //int minutes = (int) (m_dwEmulatorUptime / 60 % 60);
-        //int hours   = (int) (m_dwEmulatorUptime / 3600 % 60);
-
-        //TCHAR buffer[20];
-        //_stprintf(buffer, _T("Uptime: %02d:%02d:%02d"), hours, minutes, seconds);
-        //MainWindow_SetStatusbarText(StatusbarPartUptime, buffer);
     }
 
-    return 1;
+    return true;
 }
 
-DWORD Emulator_GetUptime()
+uint32_t Emulator_GetUptime()
 {
     return m_dwEmulatorUptime;
 }
@@ -293,6 +266,8 @@ bool Emulator_RunUntilMotorOff()
 
 bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 {
+    ASSERT(sFilePath != nullptr);
+
     // Open file
     FILE* fpFile = ::_tfsopen(sFilePath, _T("rb"), _SH_DENYWR);
     if (fpFile == INVALID_HANDLE_VALUE)
@@ -302,10 +277,12 @@ bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
     }
 
     // Allocate memory
-    BYTE* pImage = (BYTE*) ::malloc(24 * 1024);
+    uint8_t* pImage = (uint8_t*) ::malloc(24 * 1024);
+    //TODO: Check for nullptr
 
     size_t dwBytesRead = ::fread(pImage, 1, 24 * 1024, fpFile);
-    ASSERT(dwBytesRead == 24 * 1024);
+    if (dwBytesRead != 24 * 1024)
+        return false;
 
     g_pBoard->LoadROMCartridge(slot, pImage);
 
@@ -318,11 +295,15 @@ bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 
 bool Emulator_AttachFloppyImage(int slot, LPCTSTR sFilePath)
 {
+    ASSERT(sFilePath != nullptr);
+
     return g_pBoard->AttachFloppyImage(slot, sFilePath);
 }
 
 bool Emulator_AttachHardImage(int slot, LPCTSTR sFilePath)
 {
+    ASSERT(sFilePath != nullptr);
+
     return g_pBoard->AttachHardImage(slot, sFilePath);
 }
 
@@ -342,7 +323,7 @@ bool CALLBACK Emulator_TapeReadCallback(unsigned int samples)
     for (UINT i = 0; i < samples; i++)
     {
         value = WavPcmFile_ReadOne(m_hTapeWavPcmFile);
-        *(m_TapeBuffer + TAPE_BUFFER_SIZE - samples + i) = (BYTE)((value >> 24) & 0xff);
+        *(m_TapeBuffer + TAPE_BUFFER_SIZE - samples + i) = (uint8_t)((value >> 24) & 0xff);
     }
     bool result = (value >= UINT_MAX / 2);
     return result;
@@ -360,12 +341,14 @@ void CALLBACK Emulator_TapeWriteCallback(int value, UINT samples)
     {
         WavPcmFile_WriteOne(m_hTapeWavPcmFile, value);
         //TODO: Check WavPcmFile_WriteOne result
-        *(m_TapeBuffer + TAPE_BUFFER_SIZE - samples + i) = (BYTE)((value >> 24) & 0xff);
+        *(m_TapeBuffer + TAPE_BUFFER_SIZE - samples + i) = (uint8_t)((value >> 24) & 0xff);
     }
 }
 
 bool Emulator_OpenTape(LPCTSTR sFilePath)
 {
+    ASSERT(sFilePath != nullptr);
+
     m_hTapeWavPcmFile = WavPcmFile_Open(sFilePath);
     if (m_hTapeWavPcmFile == INVALID_HANDLE_VALUE)
         return false;
@@ -378,6 +361,8 @@ bool Emulator_OpenTape(LPCTSTR sFilePath)
 
 bool Emulator_CreateTape(LPCTSTR sFilePath)
 {
+    ASSERT(sFilePath != nullptr);
+
     m_hTapeWavPcmFile = WavPcmFile_Create(sFilePath, 22050);
     if (m_hTapeWavPcmFile == INVALID_HANDLE_VALUE)
         return false;
@@ -390,38 +375,39 @@ bool Emulator_CreateTape(LPCTSTR sFilePath)
 
 void Emulator_CloseTape()
 {
-    g_pBoard->SetTapeReadCallback(NULL, 0);
-    g_pBoard->SetTapeWriteCallback(NULL, 0);
+    g_pBoard->SetTapeReadCallback(nullptr, 0);
+    g_pBoard->SetTapeWriteCallback(nullptr, 0);
 
     WavPcmFile_Close(m_hTapeWavPcmFile);
     m_hTapeWavPcmFile = (HWAVPCMFILE) INVALID_HANDLE_VALUE;
 }
 
-void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
+void Emulator_PrepareScreenRGB32(void* pImageBits, const uint32_t* colors)
 {
-    if (pImageBits == NULL) return;
+    if (pImageBits == nullptr) return;
+    ASSERT(colors != nullptr);
     if (!g_okEmulatorInitialized) return;
 
     // Tag parsing loop
-    BYTE cursorYRGB;
-    bool okCursorType;
-    BYTE cursorPos = 128;
+    uint8_t cursorYRGB = 0;
+    bool okCursorType = 0;
+    uint8_t cursorPos = 128;
     bool cursorOn = false;
-    BYTE cursorAddress;      // Address of graphical cursor
-    WORD address = 0000270;  // Tag sequence start address
+    uint8_t cursorAddress = 0;  // Address of graphical cursor
+    uint16_t address = 0000270;  // Tag sequence start address
     bool okTagSize = false;  // Tag size: true - 4-word, false - 2-word (first tag is always 2-word)
     bool okTagType = false;  // Type of 4-word tag: true - set palette, false - set params
     int scale = 1;           // Horizontal scale: 1, 2, 4, or 8
-    DWORD palette = 0;       // Palette
-    DWORD palettecurrent[8];  memset(palettecurrent, 0, sizeof(palettecurrent)); // Current palette; update each time we change the "palette" variable
-    BYTE pbpgpr = 0;         // 3-bit Y-value modifier
+    uint32_t palette = 0;       // Palette
+    uint32_t palettecurrent[8];  memset(palettecurrent, 0, sizeof(palettecurrent)); // Current palette; update each time we change the "palette" variable
+    uint8_t pbpgpr = 0;         // 3-bit Y-value modifier
     for (int yy = 0; yy < 307; yy++)
     {
         if (okTagSize)    // 4-word tag
         {
-            WORD tag1 = g_pBoard->GetRAMWord(0, address);
+            uint16_t tag1 = g_pBoard->GetRAMWord(0, address);
             address += 2;
-            WORD tag2 = g_pBoard->GetRAMWord(0, address);
+            uint16_t tag2 = g_pBoard->GetRAMWord(0, address);
             address += 2;
 
             if (okTagType)  // 4-word palette tag
@@ -431,27 +417,27 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
             else  // 4-word params tag
             {
                 scale = (tag2 >> 4) & 3;  // Bits 4-5 - new scale value
-                pbpgpr = (BYTE)((7 - (tag2 & 7)) << 4);  // Y-value modifier
-                cursorYRGB = (BYTE)(tag1 & 15);  // Cursor color
+                pbpgpr = (uint8_t)((7 - (tag2 & 7)) << 4);  // Y-value modifier
+                cursorYRGB = (uint8_t)(tag1 & 15);  // Cursor color
                 okCursorType = ((tag1 & 16) != 0);  // true - graphical cursor, false - symbolic cursor
                 ASSERT(okCursorType == 0); //DEBUG
-                cursorPos = (BYTE)(((tag1 >> 8) >> scale) & 0x7f);  // Cursor position in the line
-                cursorAddress = (BYTE)((tag1 >> 5) & 7);
+                cursorPos = (uint8_t)(((tag1 >> 8) >> scale) & 0x7f);  // Cursor position in the line
+                cursorAddress = (uint8_t)((tag1 >> 5) & 7);
                 scale = 1 << scale;
             }
-            for (BYTE c = 0; c < 8; c++)  // Update palettecurrent
+            for (uint8_t c = 0; c < 8; c++)  // Update palettecurrent
             {
-                BYTE valueYRGB = (BYTE) (palette >> (c << 2)) & 15;
+                uint8_t valueYRGB = (uint8_t)(palette >> (c << 2)) & 15;
                 palettecurrent[c] = colors[pbpgpr | valueYRGB];
                 //if (pbpgpr != 0) DebugLogFormat(_T("pbpgpr %02x\r\n"), pbpgpr | valueYRGB);
             }
         }
 
-        WORD addressBits = g_pBoard->GetRAMWord(0, address);  // The word before the last word - is address of bits from all three memory planes
+        uint16_t addressBits = g_pBoard->GetRAMWord(0, address);  // The word before the last word - is address of bits from all three memory planes
         address += 2;
 
         // Calculate size, type and address of the next tag
-        WORD tagB = g_pBoard->GetRAMWord(0, address);  // Last word of the tag - is address and type of the next tag
+        uint16_t tagB = g_pBoard->GetRAMWord(0, address);  // Last word of the tag - is address and type of the next tag
         okTagSize = (tagB & 2) != 0;  // Bit 1 shows size of the next tag
         if (okTagSize)
         {
@@ -475,24 +461,24 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
 
             int xr = 640;
             int y = yy - 19;
-            DWORD* pBits = ((DWORD*)pImageBits) + (288 - 1 - y) * 640;
+            uint32_t* pBits = ((uint32_t*)pImageBits) + (288 - 1 - y) * 640;
             for (int pos = 0; ; pos++)
             {
                 // Get bit from planes 0,1,2
-                BYTE src0 = g_pBoard->GetRAMByte(0, addressBits);
-                BYTE src1 = g_pBoard->GetRAMByte(1, addressBits);
-                BYTE src2 = g_pBoard->GetRAMByte(2, addressBits);
+                uint8_t src0 = g_pBoard->GetRAMByte(0, addressBits);
+                uint8_t src1 = g_pBoard->GetRAMByte(1, addressBits);
+                uint8_t src2 = g_pBoard->GetRAMByte(2, addressBits);
                 // Loop through the bits of the byte
                 int bit = 0;
-                while (true)
+                for (;;)
                 {
-                    DWORD valueRGB;
+                    uint32_t valueRGB;
                     if (cursorOn && (pos == cursorPos) && (!okCursorType || (okCursorType && bit == cursorAddress)))
                         valueRGB = colors[cursorYRGB];  // 4-bit to 32-bit color
                     else
                     {
                         // Make 3-bit value from the bits
-                        BYTE value012 = (src0 & 1) | ((src1 & 1) << 1) | ((src2 & 1) << 2);
+                        uint8_t value012 = (src0 & 1) | ((src1 & 1) << 1) | ((src2 & 1) << 2);
                         valueRGB = palettecurrent[value012];  // 3-bit to 32-bit color
                     }
 
@@ -535,15 +521,15 @@ void Emulator_PrepareScreenRGB32(void* pImageBits, const DWORD* colors)
     }
 }
 
-bool Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
+bool Emulator_SaveScreenshot(LPCTSTR sFileName, const uint32_t * bits)
 {
-    ASSERT(bits != NULL);
-    ASSERT(sFileName != NULL);
+    ASSERT(sFileName != nullptr);
+    ASSERT(bits != nullptr);
 
     // Create file
     HANDLE hFile = ::CreateFile(sFileName,
-            GENERIC_WRITE, FILE_SHARE_READ, NULL,
-            CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+            GENERIC_WRITE, FILE_SHARE_READ, nullptr,
+            CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (hFile == INVALID_HANDLE_VALUE)
         return false;
 
@@ -563,20 +549,18 @@ bool Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
     hdr.bfSize = (DWORD) sizeof(BITMAPFILEHEADER) + bih.biSize + bih.biSizeImage;
     hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) + bih.biSize + sizeof(RGBQUAD) * 256;
 
-    DWORD dwBytesWritten = 0;
-
-    BYTE * pData = (BYTE *) ::malloc(bih.biSizeImage);
+    uint8_t * pData = (uint8_t *) ::malloc(bih.biSizeImage);
 
     // Prepare the image data
-    const DWORD * psrc = bits;
-    BYTE * pdst = pData;
-    const DWORD * palette = ScreenView_StandardRGBColors;
+    const uint32_t * psrc = bits;
+    uint8_t * pdst = pData;
+    const uint32_t * palette = ScreenView_StandardRGBColors;
     for (int i = 0; i < 640 * 288; i++)
     {
-        DWORD rgb = *psrc;
+        uint32_t rgb = *psrc;
         psrc++;
-        BYTE color = 0;
-        for (BYTE c = 0; c < 128; c++)
+        uint8_t color = 0;
+        for (uint8_t c = 0; c < 128; c++)
         {
             if (palette[c] == rgb)
             {
@@ -588,33 +572,35 @@ bool Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
         pdst++;
     }
 
-    WriteFile(hFile, &hdr, sizeof(BITMAPFILEHEADER), &dwBytesWritten, NULL);
+    DWORD dwBytesWritten = 0;
+
+    WriteFile(hFile, &hdr, sizeof(BITMAPFILEHEADER), &dwBytesWritten, nullptr);
     if (dwBytesWritten != sizeof(BITMAPFILEHEADER))
     {
         ::free(pData);
         return false;
     }
-    WriteFile(hFile, &bih, sizeof(BITMAPINFOHEADER), &dwBytesWritten, NULL);
+    WriteFile(hFile, &bih, sizeof(BITMAPINFOHEADER), &dwBytesWritten, nullptr);
     if (dwBytesWritten != sizeof(BITMAPINFOHEADER))
     {
         ::free(pData);
         return false;
     }
-    WriteFile(hFile, palette, sizeof(RGBQUAD) * 128, &dwBytesWritten, NULL);
+    WriteFile(hFile, palette, sizeof(RGBQUAD) * 128, &dwBytesWritten, nullptr);
     if (dwBytesWritten != sizeof(RGBQUAD) * 128)
     {
         ::free(pData);
         return false;
     }
     //NOTE: Write the palette for the second time, to fill colors #128-255
-    WriteFile(hFile, palette, sizeof(RGBQUAD) * 128, &dwBytesWritten, NULL);
+    WriteFile(hFile, palette, sizeof(RGBQUAD) * 128, &dwBytesWritten, nullptr);
     if (dwBytesWritten != sizeof(RGBQUAD) * 128)
     {
         ::free(pData);
         return false;
     }
 
-    WriteFile(hFile, pData, bih.biSizeImage, &dwBytesWritten, NULL);
+    WriteFile(hFile, pData, bih.biSizeImage, &dwBytesWritten, nullptr);
     ::free(pData);
     if (dwBytesWritten != bih.biSizeImage)
         return false;
@@ -627,7 +613,7 @@ bool Emulator_SaveScreenshot(LPCTSTR sFileName, const DWORD * bits)
 
 bool Emulator_SaveScreenshot(LPCTSTR sFileName)
 {
-    DWORD * bits = (DWORD *) ::malloc(640 * 288 * 4);
+    uint32_t * bits = (uint32_t *) ::malloc(640 * 288 * 4);
 
     Emulator_PrepareScreenRGB32(bits, ScreenView_StandardRGBColors);
 
@@ -640,10 +626,10 @@ bool Emulator_SaveScreenshot(LPCTSTR sFileName)
 
 
 // Returns: amount of different pixels
-int Emulator_CompareScreens(const DWORD * scr1, const DWORD * scr2)
+int Emulator_CompareScreens(const uint32_t * scr1, const uint32_t * scr2)
 {
-    const DWORD * p1 = scr1;
-    const DWORD * p2 = scr2;
+    const uint32_t * p1 = scr1;
+    const uint32_t * p2 = scr2;
 
     int result = 0;
     for (int i = 640 * 288; i > 0; i--)
@@ -657,15 +643,15 @@ int Emulator_CompareScreens(const DWORD * scr1, const DWORD * scr2)
 }
 
 // Returns: amount of different pixels
-int Emulator_CheckScreenshot(LPCTSTR sFileName, const DWORD * bits, DWORD * tempbits)
+int Emulator_CheckScreenshot(LPCTSTR sFileName, const uint32_t * bits, uint32_t * tempbits)
 {
-    ASSERT(sFileName != NULL);
-    ASSERT(bits != NULL);
+    ASSERT(sFileName != nullptr);
+    ASSERT(bits != nullptr);
 
     // Open file for reading
     HANDLE hFile = ::CreateFile(sFileName,
-            GENERIC_READ, FILE_SHARE_READ, NULL,
-            OPEN_EXISTING, 0, NULL);
+            GENERIC_READ, FILE_SHARE_READ, nullptr,
+            OPEN_EXISTING, 0, nullptr);
     if (hFile == INVALID_HANDLE_VALUE)
         return -1;
 
@@ -673,11 +659,11 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName, const DWORD * bits, DWORD * temp
     BITMAPINFOHEADER bih;
     DWORD dwBytesRead = 0;
 
-    ReadFile(hFile, &hdr, sizeof(BITMAPFILEHEADER), &dwBytesRead, NULL);
+    ReadFile(hFile, &hdr, sizeof(BITMAPFILEHEADER), &dwBytesRead, nullptr);
     if (dwBytesRead != sizeof(BITMAPFILEHEADER))
         return -1;
     //TODO: Check the header
-    ReadFile(hFile, &bih, sizeof(BITMAPINFOHEADER), &dwBytesRead, NULL);
+    ReadFile(hFile, &bih, sizeof(BITMAPINFOHEADER), &dwBytesRead, nullptr);
     if (dwBytesRead != sizeof(BITMAPINFOHEADER))
         return -1;
     //TODO: Check the header
@@ -686,9 +672,9 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName, const DWORD * bits, DWORD * temp
     // Skip the palette
     SetFilePointer(hFile, sizeof(RGBQUAD) * 256, 0, FILE_CURRENT);
 
-    BYTE * pData = (BYTE *) ::malloc(bih.biSizeImage);
+    uint8_t * pData = (uint8_t *) ::malloc(bih.biSizeImage);
 
-    ReadFile(hFile, pData, bih.biSizeImage, &dwBytesRead, NULL);
+    ReadFile(hFile, pData, bih.biSizeImage, &dwBytesRead, nullptr);
     if (dwBytesRead != bih.biSizeImage)
     {
         ::free(pData);
@@ -696,11 +682,11 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName, const DWORD * bits, DWORD * temp
     }
 
     // Decode the image data
-    BYTE * psrc = pData;
-    DWORD * pdst = tempbits;
+    uint8_t * psrc = pData;
+    uint32_t * pdst = tempbits;
     for (int i = 0; i < 640 * 288; i++)
     {
-        BYTE color = *psrc;
+        uint8_t color = *psrc;
         psrc++;
         *pdst = ScreenView_StandardRGBColors[color];
         pdst++;
@@ -719,8 +705,8 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName, const DWORD * bits, DWORD * temp
 
 int Emulator_CheckScreenshot(LPCTSTR sFileName)
 {
-    DWORD * bits = (DWORD *) ::malloc(640 * 288 * 4);
-    DWORD * tempbits = (DWORD *) ::malloc(640 * 288 * 4);
+    uint32_t * bits = (uint32_t *) ::malloc(640 * 288 * 4);
+    uint32_t * tempbits = (uint32_t *) ::malloc(640 * 288 * 4);
 
     Emulator_PrepareScreenRGB32(bits, ScreenView_StandardRGBColors);
 
@@ -732,7 +718,7 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName)
     return result;
 }
 
-void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout)
+void Emulator_KeyboardPressRelease(uint8_t ukncscan, int timeout)
 {
     g_pBoard->KeyboardEvent(ukncscan, true);
     Emulator_Run(timeout);
@@ -740,7 +726,7 @@ void Emulator_KeyboardPressRelease(BYTE ukncscan, int timeout)
     Emulator_Run(3);
 }
 
-const BYTE arrChar2UkncScan[256] =
+const uint8_t arrChar2UkncScan[256] =
 {
     /*       0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f  */
     /*0*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0153, 0000, 0000, 0153, 0000, 0000,
@@ -761,7 +747,7 @@ const BYTE arrChar2UkncScan[256] =
     /*f*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
 };
 
-const BYTE arrChar2UkncScanShift[256] =
+const uint8_t arrChar2UkncScanShift[256] =
 {
     /*       0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f  */
     /*0*/    0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000, 0000,
@@ -784,14 +770,14 @@ const BYTE arrChar2UkncScanShift[256] =
 
 void Emulator_KeyboardPressReleaseChar(char ch, int timeout)
 {
-    BYTE scan = arrChar2UkncScanShift[(BYTE)ch];
+    uint8_t scan = arrChar2UkncScanShift[(uint8_t)ch];
     if (scan != 0)
     {
         Emulator_KeyboardPressReleaseShift(scan);
         return;
     }
 
-    scan = arrChar2UkncScan[(BYTE)ch];
+    scan = arrChar2UkncScan[(uint8_t)ch];
     if (scan == 0)
         return;
     Emulator_KeyboardPressRelease(scan, timeout);
@@ -807,7 +793,7 @@ void Emulator_KeyboardSequence(const char * str)
     }
 }
 
-void Emulator_KeyboardPressReleaseShift(BYTE ukncscan)
+void Emulator_KeyboardPressReleaseShift(uint8_t ukncscan)
 {
     g_pBoard->KeyboardEvent(0105, true);
     Emulator_Run(3);
@@ -819,7 +805,7 @@ void Emulator_KeyboardPressReleaseShift(BYTE ukncscan)
     Emulator_Run(3);
 }
 
-void Emulator_KeyboardPressReleaseAlt(BYTE ukncscan)
+void Emulator_KeyboardPressReleaseAlt(uint8_t ukncscan)
 {
     g_pBoard->KeyboardEvent(0107, true);
     Emulator_Run(3);
@@ -831,7 +817,7 @@ void Emulator_KeyboardPressReleaseAlt(BYTE ukncscan)
     Emulator_Run(3);
 }
 
-void Emulator_KeyboardPressReleaseCtrl(BYTE ukncscan)
+void Emulator_KeyboardPressReleaseCtrl(uint8_t ukncscan)
 {
     g_pBoard->KeyboardEvent(046, true);
     Emulator_Run(3);
@@ -851,29 +837,28 @@ bool Emulator_SaveImage(LPCTSTR sFilePath)
 {
     // Create file
     FILE* fpFile = ::_tfsopen(sFilePath, _T("w+b"), _SH_DENYWR);
-    if (fpFile == NULL)
+    if (fpFile == nullptr)
         return false;
 
     // Allocate memory
-    BYTE* pImage = (BYTE*) ::malloc(UKNCIMAGE_SIZE);
+    uint8_t* pImage = (uint8_t*) ::malloc(UKNCIMAGE_SIZE);
     memset(pImage, 0, UKNCIMAGE_SIZE);
     // Prepare header
-    DWORD* pHeader = (DWORD*) pImage;
+    uint32_t* pHeader = (uint32_t*)pImage;
     *pHeader++ = UKNCIMAGE_HEADER1;
     *pHeader++ = UKNCIMAGE_HEADER2;
     *pHeader++ = UKNCIMAGE_VERSION;
     *pHeader++ = UKNCIMAGE_SIZE;
     // Store emulator state to the image
     g_pBoard->SaveToImage(pImage);
-    *(DWORD*)(pImage + 16) = m_dwEmulatorUptime;
+    *(uint32_t*)(pImage + 16) = m_dwEmulatorUptime;
 
     // Save image to the file
     size_t dwBytesWritten = ::fwrite(pImage, 1, UKNCIMAGE_SIZE, fpFile);
-    //TODO: Check if dwBytesWritten != UKNCIMAGE_SIZE
-
-    // Free memory, close file
     ::free(pImage);
     ::fclose(fpFile);
+    if (dwBytesWritten != UKNCIMAGE_SIZE)
+        return false;
 
     return true;
 }
@@ -882,20 +867,21 @@ bool Emulator_LoadImage(LPCTSTR sFilePath)
 {
     // Open file
     FILE* fpFile = ::_tfsopen(sFilePath, _T("rb"), _SH_DENYWR);
-    if (fpFile == NULL)
+    if (fpFile == nullptr)
         return false;
 
     Emulator_Stop();
 
     // Read header
-    DWORD bufHeader[UKNCIMAGE_HEADER_SIZE / sizeof(DWORD)];
+    uint32_t bufHeader[UKNCIMAGE_HEADER_SIZE / sizeof(uint32_t)];
     size_t dwBytesRead = ::fread(bufHeader, 1, UKNCIMAGE_HEADER_SIZE, fpFile);
     //TODO: Check if dwBytesRead != UKNCIMAGE_HEADER_SIZE
 
     //TODO: Check version and size
 
     // Allocate memory
-    BYTE* pImage = (BYTE*) ::malloc(UKNCIMAGE_SIZE);
+    uint8_t* pImage = (uint8_t*) ::malloc(UKNCIMAGE_SIZE);
+    //TODO: Check for nullptr
 
     // Read image
     ::fseek(fpFile, 0, SEEK_SET);
@@ -905,7 +891,7 @@ bool Emulator_LoadImage(LPCTSTR sFilePath)
     // Restore emulator state from the image
     g_pBoard->LoadFromImage(pImage);
 
-    m_dwEmulatorUptime = *(DWORD*)(pImage + 16);
+    m_dwEmulatorUptime = *(uint32_t*)(pImage + 16);
 
     // Free memory, close file
     ::free(pImage);

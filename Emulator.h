@@ -28,16 +28,16 @@ extern bool g_okEmulatorRunning;
 
 bool Emulator_Init();
 void Emulator_Done();
-void Emulator_SetCPUBreakpoint(WORD address);
-void Emulator_SetPPUBreakpoint(WORD address);
+void Emulator_SetCPUBreakpoint(uint16_t address);
+void Emulator_SetPPUBreakpoint(uint16_t address);
 bool Emulator_IsBreakpoint();
 void Emulator_Start();
 void Emulator_Stop();
 void Emulator_Reset();
-int  Emulator_SystemFrame();
-DWORD Emulator_GetUptime();  // UKNC uptime, in seconds
+bool Emulator_SystemFrame();
+uint32_t Emulator_GetUptime();  // UKNC uptime, in seconds
 
-void Emulator_PrepareScreenRGB32(void* pBits, const DWORD* colors);
+void Emulator_PrepareScreenRGB32(void* pBits, const uint32_t* colors);
 
 bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath);
 bool Emulator_AttachFloppyImage(int slot, LPCTSTR sFilePath);
