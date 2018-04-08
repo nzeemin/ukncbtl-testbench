@@ -216,12 +216,11 @@ bool Emulator_IsBreakpoint()
 
 bool Emulator_SystemFrame()
 {
-    //SoundGen_SetVolume(Settings_GetSoundVolume());
-
     g_pBoard->SetCPUBreakpoint(m_wEmulatorCPUBreakpoint);
     g_pBoard->SetPPUBreakpoint(m_wEmulatorPPUBreakpoint);
 
-    g_pBoard->SystemFrame();
+    if (!g_pBoard->SystemFrame())
+        return false;
 
     // Calculate emulator uptime (25 frames per second)
     m_nUptimeFrameCount++;
