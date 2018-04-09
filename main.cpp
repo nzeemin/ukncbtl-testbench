@@ -1238,28 +1238,28 @@ void Test17_VariousOther()
 
     Emulator_KeyboardSequence("RU MZ1:TSSPD\n");
     Emulator_Run(200);
-    Test_SaveScreenshot(_T("test17_tsspd_1.bmp"));
+    Test_SaveScreenshot(_T("test17_tsspdg_1.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
     Emulator_Run(200);
-    Test_SaveScreenshot(_T("test17_tsspd_2.bmp"));
+    Test_SaveScreenshot(_T("test17_tsspdg_2.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
     Emulator_Run(200);
-    Test_SaveScreenshot(_T("test17_tsspd_3.bmp"));
+    Test_SaveScreenshot(_T("test17_tsspdg_3.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
     Emulator_Run(200);
-    Test_SaveScreenshot(_T("test17_tsspd_4.bmp"));
+    Test_SaveScreenshot(_T("test17_tsspdg_4.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
     Emulator_Run(200);
-    Test_SaveScreenshot(_T("test17_tsspd_5.bmp"));
+    Test_SaveScreenshot(_T("test17_tsspdg_5.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
     Emulator_Run(200);
-    Test_SaveScreenshot(_T("test17_tsspd_6.bmp"));
+    Test_SaveScreenshot(_T("test17_tsspdg_6.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
     Emulator_Run(200);
-    Test_SaveScreenshot(_T("test17_tsspd_7.bmp"));
+    Test_SaveScreenshot(_T("test17_tsspdg_7.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
     Emulator_Run(200);
-    Test_SaveScreenshot(_T("test17_tsspd_8.bmp"));
+    Test_SaveScreenshot(_T("test17_tsspdg_8.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1267,8 +1267,118 @@ void Test17_VariousOther()
     Emulator_KeyboardSequence("RU MZ1:IRQ\n");
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
+    Test_SaveScreenshot(_T("test17_irq12.bmp"));
 
-    Test_SaveScreenshot(_T("test17_irq_1.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:MOV\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(3600);
+    Test_SaveScreenshot(_T("test17_mov01.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:MOVB\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(3600);
+    Test_SaveScreenshot(_T("test17_movb01.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:CMP\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(3650);
+    Test_SaveScreenshot(_T("test17_cmp01.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:ADD\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(3600);
+    Test_SaveScreenshot(_T("test17_add01.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:BIS\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(3600);
+    Test_SaveScreenshot(_T("test17_bis01.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:BISB\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(3600);
+    Test_SaveScreenshot(_T("test17_bisb01.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:CMPB\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(3600);
+    Test_SaveScreenshot(_T("test17_cmpb01.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:OP1\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(3600);
+    Test_SaveScreenshot(_T("test17_op1.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:MOVPC2\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_movpc2.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:TSSPDI\n");
+    Emulator_Run(250);
+    Test_SaveScreenshot(_T("test17_tsspdi_1.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspdi_2.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspdi_3.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspdi_4.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspdi_5.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspdi_6.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspdi_7.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    Emulator_Run(200);
+    Test_SaveScreenshot(_T("test17_tsspdi_8.bmp"));
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    //Test_SaveScreenshotSeria(_T("video\\test17_%04u.bmp"), 100, 100);
 
     Test_Done();
 }
