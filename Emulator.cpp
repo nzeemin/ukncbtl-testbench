@@ -267,13 +267,13 @@ bool Emulator_RunUntilCursorShown()
 {
     for (;;)
     {
-        int res = Emulator_SystemFrame();
-        if (!res)
-            return false;
         uint16_t cursortiming = g_pBoard->GetRAMWord(0, 023162);
         bool cursorshown = (cursortiming & 0200) != 0;
         if (cursorshown)
             break;
+        int res = Emulator_SystemFrame();
+        if (!res)
+            return false;
     }
     return true;
 }

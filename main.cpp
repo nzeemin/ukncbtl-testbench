@@ -68,7 +68,7 @@ void Test1_MenuAndSelfTest()
 
     Emulator_KeyboardSequence("7\n");  // Select "7 - тестирование", Enter
 
-    Emulator_RunAndWaitForCursor(20);
+    Emulator_RunAndWaitForCursor(22);
     Test_CheckScreenshot(_T("data\\test01_4.bmp"));  // Self test pass 1
     Emulator_RunAndWaitForCursor(25 * 200);
     Test_CheckScreenshot(_T("data\\test01_5.bmp"));  // Self test pass 2
@@ -682,19 +682,19 @@ void Test8_GD()
     Emulator_KeyboardPressReleaseChar('\n');
     Emulator_Run(25);
 
-    Emulator_Run(109 * 10);
+    Emulator_RunAndWaitForCursor(109 * 10);
     Test_CheckScreenshot(_T("data\\test08_01.bmp"));
-    Emulator_Run((203 - 109) * 10);
+    Emulator_RunAndWaitForCursor((203 - 109) * 10);
     Test_CheckScreenshot(_T("data\\test08_02.bmp"));
-    Emulator_Run((295 - 203) * 10);
+    Emulator_RunAndWaitForCursor((295 - 203) * 10);
     Test_CheckScreenshot(_T("data\\test08_03.bmp"));
-    Emulator_Run((338 - 295) * 10);
+    Emulator_RunAndWaitForCursor((338 - 295) * 10);
     Test_CheckScreenshot(_T("data\\test08_04.bmp"));
-    Emulator_Run((428 - 338) * 10);
+    Emulator_RunAndWaitForCursor(895);
     Test_CheckScreenshot(_T("data\\test08_05.bmp"));
-    Emulator_Run((453 - 428) * 10);
+    Emulator_RunAndWaitForCursor((453 - 428) * 10);
     Test_CheckScreenshot(_T("data\\test08_06.bmp"));
-    Emulator_Run((501 - 453) * 10);
+    Emulator_RunAndWaitForCursor((501 - 453) * 10);
     Test_CheckScreenshot(_T("data\\test08_07.bmp"));
     Emulator_Run((508 - 501) * 10);
 
@@ -713,17 +713,17 @@ void Test8_GD()
     Emulator_KeyboardSequence("DEM2\n");
     Emulator_Run(50);
 
-    Emulator_Run(208 * 10);
+    Emulator_RunAndWaitForCursor(208 * 10);
     Test_CheckScreenshot(_T("data\\test08_11.bmp"));
-    Emulator_Run((283 - 208) * 10);
+    Emulator_RunAndWaitForCursor((283 - 208) * 10);
     Test_CheckScreenshot(_T("data\\test08_12.bmp"));
-    Emulator_Run((506 - 283) * 10);
+    Emulator_RunAndWaitForCursor((506 - 283) * 10);
     Test_CheckScreenshot(_T("data\\test08_13.bmp"));
-    Emulator_Run((626 - 506) * 10);
+    Emulator_RunAndWaitForCursor((626 - 506) * 10);
     Test_CheckScreenshot(_T("data\\test08_14.bmp"));
-    Emulator_Run((987 - 626) * 10);
+    Emulator_RunAndWaitForCursor((987 - 626) * 10);
     Test_CheckScreenshot(_T("data\\test08_15.bmp"));
-    Emulator_Run((2126 - 987) * 10);
+    Emulator_RunAndWaitForCursor((2126 - 987) * 10);
     Test_CheckScreenshot(_T("data\\test08_16.bmp"));
     //Test_SaveScreenshotSeria(_T("video\\test08_%04u.bmp"), 10, 10);
 
@@ -1059,6 +1059,7 @@ void Test13_PAFCommander()
     Emulator_KeyboardSequence("PC\n");
     Emulator_Run(12 * 25);
     Test_CheckScreenshot(_T("data\\test13_01.bmp"));
+    // Здесь курсор постоянно меняет цвет
 
     Test_Done();
 }
