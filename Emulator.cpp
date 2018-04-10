@@ -263,6 +263,29 @@ bool Emulator_RunUntilMotorOff()
     return true;
 }
 
+bool Emulator_RunUntilCursorShown()
+{
+    for (;;)
+    {
+        int res = Emulator_SystemFrame();
+        if (!res)
+            return false;
+        uint16_t cursortiming = g_pBoard->GetRAMWord(0, 023162);
+        bool cursorshown = (cursortiming & 0200) != 0;
+        if (cursorshown)
+            break;
+    }
+    return true;
+}
+
+bool Emulator_RunAndWaitForCursor(int frames)
+{
+    if (!Emulator_Run(frames))
+        return false;
+
+    return Emulator_RunUntilCursorShown();
+}
+
 bool Emulator_LoadROMCartridge(int slot, LPCTSTR sFilePath)
 {
     ASSERT(sFilePath != nullptr);

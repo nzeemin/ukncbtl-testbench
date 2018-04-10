@@ -49,28 +49,28 @@ void Test1_MenuAndSelfTest()
 {
     Test_Init(_T("TEST 1: Menu & Self Test"));
 
-    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_RunAndWaitForCursor(75);  // Boot: 3 seconds
 
     Test_CheckScreenshot(_T("data\\test01_1.bmp"));  // Boot menu
 
     Emulator_KeyboardPressRelease(0152);  // "УСТ"
-    Emulator_Run(5);
+    Emulator_RunAndWaitForCursor(5);
     Test_CheckScreenshot(_T("data\\test01_2.bmp"));  // Settings menu
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
     Emulator_Run(3);
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
     Emulator_Run(3);
     Emulator_KeyboardPressRelease(0134);  // "Down arrow"
-    Emulator_Run(3);
+    Emulator_RunAndWaitForCursor(3);
     Test_CheckScreenshot(_T("data\\test01_3.bmp"));  // Settings menu: colors
     Emulator_KeyboardPressRelease(0151);  // "ИСП"
     Emulator_Run(5);
 
     Emulator_KeyboardSequence("7\n");  // Select "7 - тестирование", Enter
 
-    Emulator_Run(20);
+    Emulator_RunAndWaitForCursor(20);
     Test_CheckScreenshot(_T("data\\test01_4.bmp"));  // Self test pass 1
-    Emulator_Run(25 * 200);
+    Emulator_RunAndWaitForCursor(25 * 200);
     Test_CheckScreenshot(_T("data\\test01_5.bmp"));  // Self test pass 2
 
     Test_Done();
@@ -91,7 +91,7 @@ void Test2_Basic()
     Test_Assert(g_pBoard->GetCPUMemoryController()->GetWordView(000000, FALSE, TRUE, &nAddrType) == 0240)
     Emulator_SetCPUBreakpoint(0177777);
 
-    Emulator_Run(95);  // Boot BASIC: 5 seconds
+    Emulator_RunAndWaitForCursor(95);  // Boot BASIC
     Test_CheckScreenshot(_T("data\\test02_1.bmp"));
 
     Emulator_KeyboardSequence("PRINT PI\n");
@@ -102,7 +102,7 @@ void Test2_Basic()
     Emulator_KeyboardSequence("50 NEXT I\n");
 
     Emulator_KeyboardPressRelease(0015);  // "K5" == run
-    Emulator_Run(25);  // Wait 1 second
+    Emulator_Run(25);
     Test_CheckScreenshot(_T("data\\test02_2.bmp"));
 
     Emulator_Reset();
@@ -116,7 +116,8 @@ void Test2_Basic()
     Emulator_Run(75);  // Boot: 3 seconds
 
     Emulator_KeyboardSequence("RU DBAS\n");
-    Emulator_Run(190);  // Boot BASIC: 5 seconds
+    Emulator_RunUntilMotorOff();  // Boot BASIC
+    Emulator_RunAndWaitForCursor(25);
     Test_CheckScreenshot(_T("data\\test02_5.bmp"));
 
     // BASIC speed test by Sergey Frolov, see http://www.leningrad.su/calc/speed.php
@@ -130,8 +131,7 @@ void Test2_Basic()
     Emulator_KeyboardSequence("35 NEXT I\n");
     Emulator_KeyboardSequence("40 PRINT A, B\n");
     Emulator_KeyboardPressRelease(0015);  // "K5" == run
-    Emulator_Run(145);
-
+    Emulator_RunAndWaitForCursor(145);
     Test_SaveScreenshot(_T("test02_6.bmp"));
 
     Emulator_KeyboardSequence("NEW\n");
@@ -141,6 +141,7 @@ void Test2_Basic()
     Emulator_KeyboardSequence("3 @[\\]^_ `{|}~\n");
     Emulator_KeyboardSequence("4 ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
     Emulator_KeyboardSequence("5 abcdefghijklmnopqrstuvwxyz\n");
+    Emulator_RunUntilCursorShown();
     Test_SaveScreenshot(_T("test02_tt.bmp"));
 
     Emulator_Reset();
@@ -157,7 +158,7 @@ void Test2_Basic()
     Emulator_KeyboardSequence("40 NEXT\n");
     Emulator_KeyboardSequence("50 GOTO 50\n");
     Emulator_KeyboardSequence("RUN\n");
-    Emulator_Run(180);
+    Emulator_RunAndWaitForCursor(180);
     Test_CheckScreenshot(_T("data\\test02_rnd1.bmp"));
     Emulator_KeyboardPressRelease(0004);  // Press STOP
     Emulator_KeyboardSequence("NEW\n");
@@ -168,7 +169,7 @@ void Test2_Basic()
     Emulator_KeyboardSequence("40 NEXT\n");
     Emulator_KeyboardSequence("50 GOTO 50\n");
     Emulator_KeyboardSequence("RUN\n");
-    Emulator_Run(4000);
+    Emulator_RunAndWaitForCursor(4000);
     Test_CheckScreenshot(_T("data\\test02_rnd2.bmp"));
     //Test_SaveScreenshotSeria(_T("video\\test02_%04u.bmp"), 20, 25);
 
@@ -187,16 +188,16 @@ void Test3_FODOSTM1()
     Emulator_Run(200);  // Boot from the disk: 8 seconds
 
     Emulator_KeyboardSequence("UTST01\n");
-    Emulator_Run(1750);
+    Emulator_RunAndWaitForCursor(1750);
     Test_CheckScreenshot(_T("data\\test03_1.bmp"));
     Emulator_KeyboardPressReleaseChar('\n');
-    Emulator_Run(9725);  // 6:29
+    Emulator_RunAndWaitForCursor(9725);  // 6:29
     Test_CheckScreenshot(_T("data\\test03_2.bmp"));
     Emulator_KeyboardPressReleaseChar('\n');
-    Emulator_Run(3150);  // 2:06
+    Emulator_RunAndWaitForCursor(3150);  // 2:06
     Test_CheckScreenshot(_T("data\\test03_3.bmp"));
     Emulator_KeyboardPressReleaseChar('\n');
-    Emulator_Run(1100);  // 0:44
+    Emulator_RunAndWaitForCursor(1100);  // 0:44
     Test_CheckScreenshot(_T("data\\test03_4.bmp"));
 
     // Turn off the timer
@@ -215,14 +216,14 @@ void Test3_FODOSTM1()
     Emulator_KeyboardSequence("R FTMON\n");
     Emulator_Run(75);  // Loading FTMON
     Emulator_KeyboardSequence("D\n");  // Description
-    Emulator_Run(125);
+    Emulator_RunAndWaitForCursor(125);
     Test_CheckScreenshot(_T("data\\test03_5.bmp"));
     Emulator_KeyboardSequence("O 791401\n");
     Emulator_Run(50);
     Emulator_KeyboardSequence("O 791402\n");
     Emulator_Run(50);
     Emulator_KeyboardSequence("O 691404\n");
-    Emulator_Run(66);
+    Emulator_RunAndWaitForCursor(66);
     Test_CheckScreenshot(_T("data\\test03_6.bmp"));
 
     Emulator_KeyboardSequence("O SPEED\n");
@@ -239,7 +240,7 @@ void Test3_FODOSTM1()
     Emulator_Run(5);
     Emulator_KeyboardPressRelease(0151);  // "ИСП"
 
-    Emulator_Run(250);
+    Emulator_RunAndWaitForCursor(250);
     Test_SaveScreenshot(_T("test03_speed.bmp"));
 
     Emulator_Reset();
@@ -465,7 +466,8 @@ void Test5_Disks()
     Emulator_Run(75);  // Boot: 3 seconds
 
     Emulator_KeyboardSequence("SHOW CONF\n");
-    Emulator_Run(150);
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(15);
     Test_CheckScreenshot(_T("data\\test05_0.bmp"));
 
     // Initialize MZ1: disk
@@ -474,13 +476,15 @@ void Test5_Disks()
     Emulator_KeyboardSequence("Y\n");  // Are you sure?
     Emulator_Run(95);
     Emulator_KeyboardSequence("DIR MZ1:\n");
-    Emulator_Run(250);
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(15);
     Test_CheckScreenshot(_T("data\\test05_1.bmp"));
 
     Emulator_KeyboardSequence("COPY MZ0:PIP.SAV MZ1:\n");
     Emulator_Run(1800);
     Emulator_KeyboardSequence("DIR MZ1:\n");
-    Emulator_Run(750);
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(15);
     Test_CheckScreenshot(_T("data\\test05_2.bmp"));
 
     Emulator_KeyboardSequence("COPY /DEVICE MZ0: MZ1:\n");
@@ -1233,32 +1237,33 @@ void Test17_VariousOther()
     Emulator_KeyboardSequence("RU MZ1:IOSCAN\n");  // Run I/O port scanner
     Emulator_Run(50);
     Emulator_KeyboardSequence("RU MZ1:IOSCPP\n");  // Run I/O port scanner
-    Emulator_Run(50);
+    Emulator_Run(30);  Emulator_RunUntilCursorShown();
     Test_CheckScreenshot(_T("data\\test17_ioscan.bmp"));
 
     Emulator_KeyboardSequence("RU MZ1:TSSPD\n");
-    Emulator_Run(200);
+    Emulator_RunUntilMotorOff();
+    Emulator_RunAndWaitForCursor(30);
     Test_SaveScreenshot(_T("test17_tsspdg_1.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdg_2.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdg_3.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdg_4.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdg_5.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdg_6.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdg_7.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdg_8.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
 
@@ -1266,7 +1271,7 @@ void Test17_VariousOther()
 
     Emulator_KeyboardSequence("RU MZ1:IRQ\n");
     Emulator_RunUntilMotorOff();
-    Emulator_Run(100);
+    Emulator_RunAndWaitForCursor(100);
     Test_SaveScreenshot(_T("test17_irq12.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1275,7 +1280,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_mov01.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1284,7 +1289,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_movb01.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1293,7 +1298,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3650);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_cmp01.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1302,7 +1307,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_add01.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1311,7 +1316,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_bis01.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1320,7 +1325,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_bisb01.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1329,7 +1334,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_cmpb01.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1338,7 +1343,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_op1.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1347,43 +1352,44 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_movpc2.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
 
     Emulator_KeyboardSequence("RU MZ1:TSSPDI\n");
-    Emulator_Run(250);
+    Emulator_RunUntilMotorOff();
+    Emulator_RunAndWaitForCursor(30);
     Test_SaveScreenshot(_T("test17_tsspdi_1.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_2.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_3.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_4.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_5.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_6.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_7.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_8.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_9.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_a.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_tsspdi_b.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
 
@@ -1393,7 +1399,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_pdpclk.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1402,7 +1408,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_ash.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1411,7 +1417,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_ashc.bmp"));
 
     Emulator_KeyboardPressRelease(0153);  // "Enter"
@@ -1420,7 +1426,7 @@ void Test17_VariousOther()
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_Run(3600);
+    Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_div.bmp"));
 
     //Test_SaveScreenshotSeria(_T("video\\test17_%04u.bmp"), 100, 100);
