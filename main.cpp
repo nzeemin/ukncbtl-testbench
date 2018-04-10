@@ -85,7 +85,7 @@ void Test2_Basic()
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("2\n");  // Select boot from the cartridge
     Emulator_SetCPUBreakpoint(000000);
-    Test_Assert(!Emulator_Run(5));
+    Test_Assert(!Emulator_Run(6));
     Test_Assert(g_pBoard->GetCPU()->GetPC() == 000000);
     int nAddrType;
     Test_Assert(g_pBoard->GetCPUMemoryController()->GetWordView(000000, FALSE, TRUE, &nAddrType) == 0240)
@@ -486,7 +486,7 @@ void Test5_Disks()
     Emulator_KeyboardSequence("COPY /DEVICE MZ0: MZ1:\n");
     Emulator_Run(50);
     Emulator_KeyboardSequence("Y\n");  // Are you sure?
-    Emulator_Run(2100);
+    Emulator_RunUntilMotorOff();
     Emulator_KeyboardSequence("DIR /SUM MZ1:\n");
     Emulator_Run(150);
     Emulator_KeyboardSequence("BOOT MZ1:\n");
@@ -1413,6 +1413,15 @@ void Test17_VariousOther()
     Emulator_KeyboardSequence("8013\n");
     Emulator_Run(3600);
     Test_SaveScreenshot(_T("test17_ashc.bmp"));
+
+    Emulator_KeyboardPressRelease(0153);  // "Enter"
+
+    Emulator_KeyboardSequence("RU MZ1:DIV\n");
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_Run(3600);
+    Test_SaveScreenshot(_T("test17_div.bmp"));
 
     //Test_SaveScreenshotSeria(_T("video\\test17_%04u.bmp"), 100, 100);
 
