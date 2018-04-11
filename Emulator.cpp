@@ -40,6 +40,10 @@ uint16_t m_wEmulatorPPUBreakpoint = 0177777;
 //bool m_okEmulatorParallel = false;
 //FILE* m_fpEmulatorParallelOut = nullptr;
 
+uint8_t* m_pEmulatorTerminalBuffer = nullptr;
+int m_nEmulatorTerminalBufferSize = 0;
+int m_nEmulatorTerminalBufferIndex = 0;
+
 //long m_nFrameCount = 0;
 uint32_t m_dwTickCount = 0;
 uint32_t m_dwEmulatorUptime = 0;  // UKNC uptime, seconds, from turn on or reset, increments every 25 frames
@@ -402,6 +406,44 @@ void Emulator_CloseTape()
 
     WavPcmFile_Close(m_hTapeWavPcmFile);
     m_hTapeWavPcmFile = (HWAVPCMFILE) INVALID_HANDLE_VALUE;
+}
+
+void CALLBACK Emulator_TerminalCallback(uint8_t symbol)
+{
+    if (m_pEmulatorTerminalBuffer == NULL)
+        return;
+    if (m_nEmulatorTerminalBufferIndex >= m_nEmulatorTerminalBufferSize)
+        return;
+
+    m_pEmulatorTerminalBuffer[m_nEmulatorTerminalBufferIndex] = symbol;
+    m_nEmulatorTerminalBufferIndex++;
+    m_pEmulatorTerminalBuffer[m_nEmulatorTerminalBufferIndex] = 0;
+}
+
+const uint8_t * Emulator_GetTerminalBuffer()
+{
+    return m_pEmulatorTerminalBuffer;
+}
+void Emulator_AttachTerminalBuffer(int bufferSize)
+{
+    ASSERT(bufferSize > 0);
+
+    m_pEmulatorTerminalBuffer = static_cast<uint8_t*>(::calloc(bufferSize + 1, 1));
+    m_nEmulatorTerminalBufferIndex = 0;
+    m_nEmulatorTerminalBufferSize = bufferSize;
+    m_pEmulatorTerminalBuffer[0] = 0;
+
+    g_pBoard->SetTerminalCallback(Emulator_TerminalCallback);
+}
+void Emulator_DetachTerminalBuffer()
+{
+    g_pBoard->SetTerminalCallback(NULL);
+
+    if (m_pEmulatorTerminalBuffer != NULL)
+    {
+        ::free(m_pEmulatorTerminalBuffer);
+        m_pEmulatorTerminalBuffer = NULL;
+    }
 }
 
 void Emulator_PrepareScreenRGB32(void* pImageBits, const uint32_t* colors)

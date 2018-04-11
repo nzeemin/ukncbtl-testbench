@@ -64,5 +64,9 @@ void Emulator_KeyboardPressReleaseCtrl(BYTE ukncscan);
 bool Emulator_SaveImage(LPCTSTR sFilePath);
 bool Emulator_LoadImage(LPCTSTR sFilePath);
 
+void Emulator_AttachTerminalBuffer(int bufferSize = 4096);
+void Emulator_DetachTerminalBuffer();
+const uint8_t * Emulator_GetTerminalBuffer();
+
 
 //////////////////////////////////////////////////////////////////////

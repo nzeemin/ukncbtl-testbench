@@ -46,6 +46,7 @@ void DebugPrint(LPCTSTR message);
 void DebugPrintFormat(LPCTSTR pszFormat, ...);
 void DebugLogClear();
 void DebugLog(LPCTSTR message);
+void DebugLog(const char * message);
 void DebugLogFormat(LPCTSTR pszFormat, ...);
 
 #endif // !defined(PRODUCT)
@@ -97,6 +98,7 @@ void Test_LoadStateImage(LPCTSTR sFileName);
 
 #define Test_Assert(f) {if (!(f)) Test_AssertFailed(__FILE__, __LINE__);}
 void Test_AssertFailed(LPCSTR lpszFileName, int nLine);
+void Test_CompareText(const char * text, const char * etalon);
 
 
 //////////////////////////////////////////////////////////////////////

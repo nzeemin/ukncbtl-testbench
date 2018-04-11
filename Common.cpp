@@ -91,8 +91,28 @@ void DebugLog(LPCTSTR message)
     SetFilePointer(Common_LogFile, 0, NULL, FILE_END);
 
     DWORD dwLength = lstrlen(message) * sizeof(TCHAR);
+
+    char ascii[256];  *ascii = 0;
+    WideCharToMultiByte(CP_ACP, 0, message, dwLength, ascii, 256, NULL, NULL);
+
     DWORD dwBytesWritten = 0;
-    WriteFile(Common_LogFile, message, dwLength, &dwBytesWritten, NULL);
+    //WriteFile(Common_LogFile, message, dwLength, &dwBytesWritten, NULL);
+    WriteFile(Common_LogFile, ascii, (uint32_t)strlen(ascii), &dwBytesWritten, NULL);
+}
+void DebugLog(const char * message)
+{
+    if (Common_LogFile == NULL)
+    {
+        // Create file
+        Common_LogFile = CreateFile(TRACELOG_FILE_NAME,
+            GENERIC_WRITE, FILE_SHARE_READ, NULL,
+            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    }
+    SetFilePointer(Common_LogFile, 0, NULL, FILE_END);
+
+    DWORD dwBytesWritten = 0;
+    //WriteFile(Common_LogFile, message, dwLength, &dwBytesWritten, NULL);
+    WriteFile(Common_LogFile, message, (uint32_t)strlen(message), &dwBytesWritten, NULL);
 }
 
 void DebugLogFormat(LPCTSTR pszFormat, ...)
@@ -366,6 +386,52 @@ void Test_LoadStateImage(LPCTSTR sFileName)
 void Test_AssertFailed(LPCSTR sFileName, int nLine)
 {
     Test_LogFormat('E', _T("ASSERT FAILED in %S at line %d"), sFileName, nLine);
+}
+
+void Test_CompareText(const char * text, const char * etalon)
+{
+    bool equal = true;
+    int pos;
+    for (pos = 0;; pos++)
+    {
+        if (text[pos] == 0 && etalon[pos] == 0)
+            break;
+        if (text[pos] == 0 || etalon[pos] == 0 || text[pos] != etalon[pos])
+        {
+            equal = false;
+            break;
+        }
+    }
+    if (equal)
+        return;
+
+    Test_LogFormat('E', _T("TEST FAILED checking text, diff at pos %d"), pos);
+
+    HANDLE hStdOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
+    equal = true;
+    for (pos = 0;; pos++)
+    {
+        if (text[pos] == 0 && etalon[pos] == 0)
+            break;
+        if (text[pos] == 0 || etalon[pos] == 0)
+            break;  //TODO: show other symbol
+        if (text[pos] == etalon[pos])
+        {
+            if (!equal)
+                ::SetConsoleTextAttribute(hStdOut, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            equal = true;
+        }
+        else
+        {
+            if (equal)
+                ::SetConsoleTextAttribute(hStdOut, FOREGROUND_RED | FOREGROUND_INTENSITY);
+            equal = false;
+        }
+
+        printf("%c", text[pos]);
+    }
+    printf("\n");
+    ::SetConsoleTextAttribute(hStdOut, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
 
