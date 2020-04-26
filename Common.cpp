@@ -24,20 +24,27 @@ int m_nCommon_TestsFailed = 0;
 
 //////////////////////////////////////////////////////////////////////
 
-bool AssertFailedLine(LPCSTR /*lpszFileName*/, int /*nLine*/)
+bool AssertFailedLine(LPCSTR lpszFileName, int nLine)
 {
-    //TODO: Implement in this environment
+    DebugPrintFormat(_T("ASSERT in %s at line %n"), lpszFileName, nLine);
 
     return FALSE;
 }
 
-void AlertWarning(LPCTSTR /*sMessage*/)
+void AlertWarning(LPCTSTR sMessage)
 {
-    //TODO: Implement in this environment
+    Test_Log('*', sMessage);
 }
-void AlertWarningFormat(LPCTSTR /*sFormat*/, ...)
+void AlertWarningFormat(LPCTSTR format, ...)
 {
-    //TODO: Implement in this environment
+    TCHAR buffer[512];
+
+    va_list ptr;
+    va_start(ptr, format);
+    _vsntprintf_s(buffer, 512, 512 - 1, format, ptr);
+    va_end(ptr);
+
+    Test_Log('*', buffer);
 }
 
 
@@ -105,8 +112,8 @@ void DebugLog(const char * message)
     {
         // Create file
         Common_LogFile = CreateFile(TRACELOG_FILE_NAME,
-            GENERIC_WRITE, FILE_SHARE_READ, NULL,
-            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+                GENERIC_WRITE, FILE_SHARE_READ, NULL,
+                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     }
     SetFilePointer(Common_LogFile, 0, NULL, FILE_END);
 
@@ -411,11 +418,12 @@ void Test_CompareText(const char * text, const char * etalon)
     equal = true;
     for (pos = 0;; pos++)
     {
-        if (text[pos] == 0 && etalon[pos] == 0)
+        char ch = text[pos];
+        if (ch == 0 && etalon[pos] == 0)
             break;
-        if (text[pos] == 0 || etalon[pos] == 0)
+        if (ch == 0 || etalon[pos] == 0)
             break;  //TODO: show other symbol
-        if (text[pos] == etalon[pos])
+        if (ch == etalon[pos])
         {
             if (!equal)
                 ::SetConsoleTextAttribute(hStdOut, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
@@ -426,9 +434,10 @@ void Test_CompareText(const char * text, const char * etalon)
             if (equal)
                 ::SetConsoleTextAttribute(hStdOut, FOREGROUND_RED | FOREGROUND_INTENSITY);
             equal = false;
+            if (ch == ' ') ch = -6; //0xfa;
         }
 
-        printf("%c", text[pos]);
+        printf("%c", ch);
     }
     printf("\n");
     ::SetConsoleTextAttribute(hStdOut, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);

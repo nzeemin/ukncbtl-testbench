@@ -1233,13 +1233,35 @@ void Test17_VariousOther()
     Emulator_KeyboardSequence("1\n");
     Emulator_Run(200);  // Boot: 8 seconds
     Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
-    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_Run(120);  // Boot: 3 seconds
 
+    const char * etalonIOSCAN = "\r\n"
+            "176560-176576\r\n"
+            "176640-176646\r\n"
+            "176660-176676\r\n"
+            "177560-177566\r\n\r\n.";
     Emulator_KeyboardSequence("RU MZ1:IOSCAN\n");  // Run I/O port scanner
-    Emulator_Run(50);
+    Emulator_AttachTerminalBuffer();
+    Emulator_Run(55);
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonIOSCAN);
+    Emulator_DetachTerminalBuffer();
+
+    const char * etalonIOSCPP = "\r\n"
+            "177010-177026\r\n"
+            "177054\r\n"
+            "177060-177102\r\n"
+            "177130-177132\r\n"
+            "177700-177704\r\n"
+            "177710\r\n"
+            "177714-177716\r\n\r\n.";
     Emulator_KeyboardSequence("RU MZ1:IOSCPP\n");  // Run I/O port scanner
-    Emulator_Run(30);  Emulator_RunUntilCursorShown();
+    Emulator_AttachTerminalBuffer();
+    Emulator_Run(33);  Emulator_RunUntilCursorShown();
     Test_CheckScreenshot(_T("data\\test17_ioscan.bmp"));
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonIOSCPP);
+    Emulator_DetachTerminalBuffer();
 
     Emulator_KeyboardSequence("RU MZ1:TSSPD\n");
     Emulator_RunUntilMotorOff();
@@ -1268,86 +1290,205 @@ void Test17_VariousOther()
     Test_SaveScreenshot(_T("test17_tsspdg_8.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
 
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
     Emulator_KeyboardSequence("RU MZ1:IRQ\n");
     Emulator_RunUntilMotorOff();
     Emulator_RunAndWaitForCursor(100);
     Test_SaveScreenshot(_T("test17_irq12.bmp"));
 
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
+    const char * etalonMOV =
+        "MOV - v1.0\r\nCPU KHz:  5300 > 8013\r\nCPU KHz:  8013\r\n\r\n"
+        "               R0  (R0)  (R2)+  @(R2)+  -(R1)  @-(R1)  Addr  (PC)+  @Tab(R0)\n\r\n"
+        "Mov     R1     12   35    35      48      35      48    48    47      64 \r\n"
+        "Mov    (R1)    33   50    50      66      50      70    66    66      82 \r\n"
+        "Mov    (R2)+   33   50    50      66      50      70    66    66      82 \r\n"
+        "Mov    (PC)+   33   50    50      66      50      66    66    66      82 \r\n"
+        "Mov   @(R2)+   47   70    70      80      70      83    82    82      96 \r\n"
+        "Mov   -(R1)    33   50    50      66      50      70    66    66      82 \r\n"
+        "Mov  @-(R1)    47   70    70      80      70      83    82    82      96 \r\n"
+        "Mov    Addr    47   66    66      82      66      82    80    80      96 \r\n"
+        "Mov  @Tab(R1)  60   80    80      96      80      96    96    96      110 \r\n"
+        "\r\nProgram completed.\r\n\r\n.";
     Emulator_KeyboardSequence("RU MZ1:MOV\n");
+    Emulator_AttachTerminalBuffer();
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
     Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_mov01.bmp"));
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    //Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonMOV);
+    Emulator_DetachTerminalBuffer();
 
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
+    const char * etalonMOVB =
+        "MovB - v1.0\r\nCPU KHz:  5300 > 8013\r\nCPU KHz:  8013\r\n\r\n"
+        "               R0  (R0)  (R2)+  @(R2)+  -(R1)  @-(R1)  Addr  (PC)+  @Tab(R0)\n\r\n"
+        "MovB    R1     13   40    40      59      40      59    59    57      71 \r\n"
+        "MovB   (R1)    33   59    59      76      64      80    75    76      93 \r\n"
+        "MovB   (R2)+   33   59    59      76      64      80    76    76      93 \r\n"
+        "MovB   (PC)+   47   76    76      93      76      93    85    85     103 \r\n"
+        "MovB  @(R2)+   47   71    71      85      80      94    93    93     107 \r\n"
+        "MovB  -(R1)    33   59    59      76      64      80    76    76      93 \r\n"
+        "MovB @-(R1)    47   71    71      85      80      94    93    93     106 \r\n"
+        "MovB   Addr    47   80    80      93      80      93    85    85     106 \r\n"
+        "MovB @Tab(R1)  60   89    89     106      89     106   106   101     120 \r\n"
+        "\r\nProgram completed.\r\n\r\n.";
     Emulator_KeyboardSequence("RU MZ1:MOVB\n");
+    Emulator_AttachTerminalBuffer();
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
-    Emulator_RunAndWaitForCursor(3600);
+    Emulator_RunAndWaitForCursor(4100);
     Test_SaveScreenshot(_T("test17_movb01.bmp"));
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    //Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonMOVB);
+    Emulator_DetachTerminalBuffer();
 
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
+    const char * etalonCMP =
+        "Cmp - v1.0\r\nCPU KHz:  5300 > 8013\r\nCPU KHz:  8013\r\n\r\n"
+        "               R0  (R0)  (R2)+  @(R2)+  -(R1)  @-(R1)  Addr  (PC)+  @Tab(R0)\n\r\n"
+        "Cmp     R1     13   33    33      47      33      47    47    33      60 \r\n"
+        "Cmp    (R1)    33   47    47      66      50      66    66    50      82 \r\n"
+        "Cmp    (R2)+   33   47    47      66      50      66    66    50      82 \r\n"
+        "Cmp    (PC)+   33   47    47      60      47      60    66    50      80 \r\n"
+        "Cmp   @(R2)+   47   60    60      80      66      82    82    70      96 \r\n"
+        "Cmp   -(R1)    33   47    47      66      50      66    66    50      82 \r\n"
+        "Cmp  @-(R1)    47   60    60      80      66      82    82    70      96 \r\n"
+        "Cmp    Addr    47   66    66      80      66      80    80    66      94 \r\n"
+        "Cmp  @Tab(R1)  60   80    80      94      80      94    94    82     108 \r\n"
+        "\r\nProgram completed.\r\n\r\n.";
     Emulator_KeyboardSequence("RU MZ1:CMP\n");
+    Emulator_AttachTerminalBuffer();
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
     Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_cmp01.bmp"));
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    //Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonCMP);
+    Emulator_DetachTerminalBuffer();
 
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
-    Emulator_KeyboardSequence("RU MZ1:ADD\n");
-    Emulator_RunUntilMotorOff();
-    Emulator_Run(100);
-    Emulator_KeyboardSequence("8013\n");
-    Emulator_RunAndWaitForCursor(3600);
-    Test_SaveScreenshot(_T("test17_add01.bmp"));
-
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
-    Emulator_KeyboardSequence("RU MZ1:BIS\n");
-    Emulator_RunUntilMotorOff();
-    Emulator_Run(100);
-    Emulator_KeyboardSequence("8013\n");
-    Emulator_RunAndWaitForCursor(3600);
-    Test_SaveScreenshot(_T("test17_bis01.bmp"));
-
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
-    Emulator_KeyboardSequence("RU MZ1:BISB\n");
-    Emulator_RunUntilMotorOff();
-    Emulator_Run(100);
-    Emulator_KeyboardSequence("8013\n");
-    Emulator_RunAndWaitForCursor(3600);
-    Test_SaveScreenshot(_T("test17_bisb01.bmp"));
-
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
+    const char * etalonCMPB =
+        "CmpB - v1.0\r\nCPU KHz:  5300 > 8013\r\nCPU KHz:  8013\r\n\r\n"
+        "               R0  (R0)  (R2)+  @(R2)+  -(R1)  @-(R1)  Addr  (PC)+  @Tab(R0)\n\r\n"
+        "CmpB    R1     13   33    33      47      33      47    47    47      60 \r\n"
+        "CmpB   (R1)    33   47    47      66      50      66    66    66      82 \r\n"
+        "CmpB   (R2)+   33   47    47      66      50      66    66    66      82 \r\n"
+        "CmpB   (PC)+   47   66    66      80      66      80    80    80      94 \r\n"
+        "CmpB  @(R2)+   47   60    60      80      66      82    82    82      96 \r\n"
+        "CmpB  -(R1)    33   47    47      66      50      66    66    66      82 \r\n"
+        "CmpB @-(R1)    47   60    60      80      66      82    82    82      94 \r\n"
+        "CmpB   Addr    47   66    66      80      66      80    80    80      94 \r\n"
+        "CmpB @Tab(R1)  60   80    80      94      80      94    94    94     108 \r\n"
+        "\r\nProgram completed.\r\n\r\n.";
     Emulator_KeyboardSequence("RU MZ1:CMPB\n");
+    Emulator_AttachTerminalBuffer();
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
     Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_cmpb01.bmp"));
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    //Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonCMPB);
+    Emulator_DetachTerminalBuffer();
 
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    const char * etalonADD =
+        "Add - v1.0\r\nCPU KHz:  5300 > 8013\r\nCPU KHz:  8013\r\n\r\n"
+        "               R0  (R0)  (R2)+  @(R2)+  -(R1)  @-(R1)  Addr  (PC)+  @Tab(R0)\n\r\n"
+        "Add     R1     13   40    40      59      40      59    59    57      72 \r\n"
+        "Add    (R1)    33   59    59      76      64      80    75    76      93 \r\n"
+        "Add    (R2)+   33   59    59      75      64      80    75    76      93 \r\n"
+        "Add    (PC)+   33   60    60      80      60      80    75    75      93 \r\n"
+        "Add   @(R2)+   47   72    72      85      80      94    93    93     107 \r\n"
+        "Add   -(R1)    33   59    59      74      64      80    74    74      93 \r\n"
+        "Add  @-(R1)    47   71    71      85      80      94    93    93     107 \r\n"
+        "Add    Addr    47   79    79      93      79      93    85    85     106 \r\n"
+        "Add  @Tab(R1)  60   88    88     107      88     107   106   101     120 \r\n"
+        "\r\nProgram completed.\r\n\r\n.";
+    Emulator_KeyboardSequence("RU MZ1:ADD\n");
+    Emulator_AttachTerminalBuffer();
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_RunAndWaitForCursor(4000);
+    Test_SaveScreenshot(_T("test17_add01.bmp"));
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    //Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonADD);
+    Emulator_DetachTerminalBuffer();
 
+    const char * etalonBIS =
+        "BiS - v1.0\r\nCPU KHz:  5300 > 8013\r\nCPU KHz:  8013\r\n\r\n"
+        "               R0  (R0)  (R2)+  @(R2)+  -(R1)  @-(R1)  Addr  (PC)+  @Tab(R0)\n\r\n"
+        "BiS     R1     13   40    40      59      40      59    59    57      72 \r\n"
+        "BiS    (R1)    33   59    59      77      65      80    78    79      93 \r\n"
+        "BiS    (R2)+   33   59    59      76      65      80    76    76      93 \r\n"
+        "BiS    (PC)+   33   60    60      80      60      80    75    75      93 \r\n"
+        "BiS   @(R2)+   47   71    71      85      80      94    93    93     106 \r\n"
+        "BiS   -(R1)    33   59    59      76      64      80    76    77      93 \r\n"
+        "BiS  @-(R1)    47   72    72      85      80      94    93    93     107 \r\n"
+        "BiS    Addr    47   80    80      93      80      93    85    85     106 \r\n"
+        "BiS  @Tab(R1)  60   89    89     106      89     106   106   101     120 \r\n"
+        "\r\nProgram completed.\r\n\r\n.";
+    Emulator_KeyboardSequence("RU MZ1:BIS\n");
+    Emulator_AttachTerminalBuffer();
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_RunAndWaitForCursor(3800);
+    Test_SaveScreenshot(_T("test17_bis01.bmp"));
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    //Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonBIS);
+    Emulator_DetachTerminalBuffer();
+
+    const char * etalonBISB =
+        "BiSB - v1.0\r\nCPU KHz:  5300 > 8013\r\nCPU KHz:  8013\r\n\r\n"
+        "               R0  (R0)  (R2)+  @(R2)+  -(R1)  @-(R1)  Addr  (PC)+  @Tab(R0)\n\r\n"
+        "BiSB    R1     13   40    40      59      40      59    59    57      72 \r\n"
+        "BiSB   (R1)    33   59    59      77      65      80    76    76      93 \r\n"
+        "BiSB   (R2)+   33   59    59      76      64      80    75    77      93 \r\n"
+        "BiSB   (PC)+   47   76    76      93      76      93    85    85     103 \r\n"
+        "BiSB  @(R2)+   47   71    71      85      80      94    93    93     107 \r\n"
+        "BiSB  -(R1)    33   59    59      77      65      80    77    79      93 \r\n"
+        "BiSB @-(R1)    47   71    71      85      80      94    93    93     106 \r\n"
+        "BiSB   Addr    47   80    80      93      80      93    85    85     106 \r\n"
+        "BiSB @Tab(R1)  60   89    89     106      89     106   106   101     120 \r\n"
+        "\r\nProgram completed.\r\n\r\n.";
+    Emulator_KeyboardSequence("RU MZ1:BISB\n");
+    Emulator_AttachTerminalBuffer();
+    Emulator_RunUntilMotorOff();
+    Emulator_Run(100);
+    Emulator_KeyboardSequence("8013\n");
+    Emulator_RunAndWaitForCursor(4200);
+    Test_SaveScreenshot(_T("test17_bisb01.bmp"));
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    //Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonBISB);
+    Emulator_DetachTerminalBuffer();
+
+    const char * etalonOP1 =
+        "Op1 - v1.0\r\nCPU KHz:  5300 > 8013\r\nCPU KHz:  8013\r\n\r\n"
+        "SOB : 46 ! Last SOB : 26 ! Br  : 38 ! BCS : 17 ! BCC : 38 ! SeC : 14\r\n\r\n"
+        "               R0  (R0)  (R2)+  @(R2)+  -(R1)  @-(R1)  Addr  (PC)+  @Tab(R0)\n\r\n"
+        "Tst            13   33    33      47      33      47    47    35      60 \r\n"
+        "TstB           13   33    33      47      33      47    47    47      60 \r\n"
+        "Inc            12   40    40      59      40      59    59    56      71 \r\n"
+        "IncB           13   40    40      59      40      59    59    56      71 \r\n"
+        "Clr            13   35    35      48      35      48    48    47      64 \r\n"
+        "ClrB           13   40    40      59      40      59    59    56      71 \r\n"
+        "MTPS           16   40    40      54      40      54    54    50      70 \r\n"
+        "MFPS           13   40    40      59      40      59    59    56      71 \r\n"
+        "XOr            13   40    40      59      40      59    59    56      71 \r\n"
+        "SwaB           13   40    40      59      40      59    59    56      71 \r\n"
+        "SXt            13   35    35      48      35      48    48    47      64 \r\n"
+        "\r\nProgram completed.\r\n\r\n.";
     Emulator_KeyboardSequence("RU MZ1:OP1\n");
+    Emulator_AttachTerminalBuffer();
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
     Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_op1.bmp"));
-
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
+    DebugLog((const char *)Emulator_GetTerminalBuffer());
+    //Test_CompareText((const char *)Emulator_GetTerminalBuffer(), etalonOP1);
+    Emulator_DetachTerminalBuffer();
 
     Emulator_KeyboardSequence("RU MZ1:MOVPC2\n");
     Emulator_RunUntilMotorOff();
@@ -1355,8 +1496,6 @@ void Test17_VariousOther()
     Emulator_KeyboardSequence("8013\n");
     Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_movpc2.bmp"));
-
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
 
     Emulator_KeyboardSequence("RU MZ1:TSSPDI\n");
     Emulator_RunUntilMotorOff();
@@ -1394,16 +1533,12 @@ void Test17_VariousOther()
     Test_SaveScreenshot(_T("test17_tsspdi_b.bmp"));
     Emulator_KeyboardPressRelease(0153);  // "Enter"
 
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
     Emulator_KeyboardSequence("RU MZ1:PDPCLK\n");
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardPressRelease(0153);  // "Enter"
     Emulator_RunAndWaitForCursor(200);
     Test_SaveScreenshot(_T("test17_pdpclk.bmp"));
-
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
 
     Emulator_KeyboardSequence("RU MZ1:ASH\n");
     Emulator_RunUntilMotorOff();
@@ -1412,16 +1547,12 @@ void Test17_VariousOther()
     Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_ash.bmp"));
 
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
-
     Emulator_KeyboardSequence("RU MZ1:ASHC\n");
     Emulator_RunUntilMotorOff();
     Emulator_Run(100);
     Emulator_KeyboardSequence("8013\n");
     Emulator_RunAndWaitForCursor(3600);
     Test_SaveScreenshot(_T("test17_ashc.bmp"));
-
-    Emulator_KeyboardPressRelease(0153);  // "Enter"
 
     Emulator_KeyboardSequence("RU MZ1:DIV\n");
     Emulator_RunUntilMotorOff();
@@ -1439,6 +1570,7 @@ int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
 {
     SYSTEMTIME timeFrom;  ::GetLocalTime(&timeFrom);
     Test_LogInfo(_T("Initialization..."));
+    DebugLogClear();
 
     Test0_ListBusDevices();
     Test1_MenuAndSelfTest();
