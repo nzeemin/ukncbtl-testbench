@@ -284,11 +284,11 @@ void Test4_Games()
     Emulator_KeyboardSequence("01-01-99\n\n\n");  // Date
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("RU MZ1:GOBLIN\n");
-    Emulator_Run(200);  // 8 seconds
+    Emulator_RunAndWaitForCursor(200);  // 8 seconds
     Test_CheckScreenshot(_T("data\\test04_1.bmp"));  // Title screen
     Emulator_Run(300);  // 12 seconds
     Emulator_KeyboardPressRelease(0153);  // "Enter"
-    Emulator_Run(25);
+    Emulator_RunAndWaitForCursor(25);
     Test_CheckScreenshot(_T("data\\test04_2.bmp"));  // Game start screen
 
     Emulator_Reset();
@@ -301,7 +301,7 @@ void Test4_Games()
     Emulator_KeyboardSequence("RU MZ1:DIGGER\n");
     Emulator_Run(400);  // Skip titles
     Emulator_KeyboardSequence("1");  // Game rank
-    Emulator_Run(120);
+    Emulator_RunAndWaitForCursor(120);
     Test_CheckScreenshot(_T("data\\test04_3.bmp"));
 
     Emulator_Reset();
@@ -312,14 +312,14 @@ void Test4_Games()
     Emulator_KeyboardSequence("01-01-99\n\n\n");
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("RU MZ1:CASTLE\n");
-    Emulator_Run(225);  // Wait for title on blue background
+    Emulator_RunAndWaitForCursor(225);  // Wait for title on blue background
     Test_CheckScreenshot(_T("data\\test04_4.bmp"));
     Emulator_KeyboardSequence(" ");
     Emulator_Run(50);
     Emulator_KeyboardSequence("1");  // Game rank
     Emulator_Run(75);
     Emulator_KeyboardPressRelease(0133);  // Right arrow
-    Emulator_Run(5);
+    Emulator_RunAndWaitForCursor(5);
     Test_CheckScreenshot(_T("data\\test04_5.bmp"));
 
     Emulator_Reset();
@@ -330,7 +330,7 @@ void Test4_Games()
     Emulator_KeyboardSequence("01-01-99\n\n\n");
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("RU MZ1:SOUCOB\n");
-    Emulator_Run(275);
+    Emulator_RunAndWaitForCursor(275);
     Test_CheckScreenshot(_T("data\\test04_6.bmp"));
     Emulator_KeyboardSequence(" ");
     Emulator_Run(50);
@@ -358,10 +358,10 @@ void Test4_Games()
     Emulator_KeyboardSequence("01-01-99\n\n\n");
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("RU MZ1:GARDEN\n");
-    Emulator_Run(220);
+    Emulator_RunAndWaitForCursor(200);
     Test_CheckScreenshot(_T("data\\test04_10.bmp"));
     Emulator_KeyboardSequence(" ");
-    Emulator_Run(75);
+    Emulator_RunAndWaitForCursor(65);
     Test_CheckScreenshot(_T("data\\test04_11.bmp"));
 
     Emulator_Reset();
@@ -384,11 +384,11 @@ void Test4_Games()
     Emulator_KeyboardSequence("01-01-99\n\n\n");
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("RU MZ1:LAND\n");
-    Emulator_Run(200);
+    Emulator_RunAndWaitForCursor(200);
     Test_CheckScreenshot(_T("data\\test04_14.bmp"));
     Emulator_Run(10);
     Emulator_KeyboardPressReleaseChar(' ', 15);
-    Emulator_Run(100);
+    Emulator_RunAndWaitForCursor(95);
     Test_CheckScreenshot(_T("data\\test04_15.bmp"));
 
     Emulator_Reset();
@@ -436,10 +436,10 @@ void Test4_Games()
     Emulator_KeyboardSequence("01-01-99\n\n\n");
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("RU MZ1:SAPER\n");
-    Emulator_Run(33 * 25);
+    Emulator_RunAndWaitForCursor(33 * 25);
     Test_CheckScreenshot(_T("data\\test04_22.bmp"));
     Emulator_KeyboardPressReleaseChar(' ');
-    Emulator_Run(6 * 25);
+    Emulator_RunAndWaitForCursor(6 * 25);
     Test_CheckScreenshot(_T("data\\test04_23.bmp"));
     Emulator_KeyboardPressReleaseChar(' ');
     Emulator_Run(5 * 25);
@@ -467,7 +467,7 @@ void Test5_Disks()
 
     Emulator_KeyboardSequence("SHOW CONF\n");
     Emulator_RunUntilMotorOff();
-    Emulator_Run(15);
+    Emulator_RunAndWaitForCursor(15);
     Test_CheckScreenshot(_T("data\\test05_0.bmp"));
 
     // Initialize MZ1: disk
@@ -518,7 +518,7 @@ void Test52_Disk_TESTMZ()
     Emulator_Run(75);  // Boot: 3 seconds
 
     Emulator_KeyboardSequence("TESTMZ\n");
-    Emulator_Run(150);
+    Emulator_RunAndWaitForCursor(150);
     Test_CheckScreenshot(_T("data\\test052_0.bmp"));
 
     Emulator_KeyboardPressRelease(0134, 10);  // "Down arrow"
@@ -531,7 +531,7 @@ void Test52_Disk_TESTMZ()
     Emulator_KeyboardSequence("\n");   // "СЕКТОР"
     Emulator_KeyboardSequence("\n");   // "КОД-БАЙТ"
     Test_CheckScreenshot(_T("data\\test052_1.bmp"));
-    Emulator_Run(43 * 75 + 8 * 25);  // Formatting
+    Emulator_RunAndWaitForCursor(43 * 75 + 8 * 25);  // Formatting
     Test_CheckScreenshot(_T("data\\test052_2.bmp"));
     Emulator_KeyboardSequence("K\n");  // Exit to main menu
 
@@ -564,8 +564,8 @@ void Test6_TurboBasic()
     Emulator_Run(75);  // Boot: 3 seconds
 
     Emulator_KeyboardSequence("TURBO\n");
-    Emulator_Run(600);
-    Test_CheckScreenshot(_T("data\\test06_1.bmp"));
+    Emulator_Run(590);
+    Test_CheckScreenshot(_T("data\\test06_01.bmp"));
 
     // Load TESTGR.BAS and run, see http://zx.pk.ru/showpost.php?p=420453&postcount=238
     Emulator_KeyboardPressRelease(0012);  // "K3"
@@ -573,7 +573,7 @@ void Test6_TurboBasic()
     // Здесь была проблема: "Диалог не заполняется как надо, сколько ни жди; в эмуляторе работает нормально"; исправилось в r397
     Test_CheckScreenshot(_T("data\\test06_02.bmp"));
     Emulator_KeyboardSequence("TESTGR\n");
-    Emulator_Run(175);
+    Emulator_Run(170);
     Test_CheckScreenshot(_T("data\\test06_03.bmp"));
     Emulator_KeyboardPressReleaseAlt(0171);  // Alt+F9 -- Compile
     Emulator_Run(25 * 9);
@@ -594,7 +594,7 @@ void Test6_TurboBasic()
     Emulator_Run(5 * 32);
     Test_CheckScreenshot(_T("data\\test06_08.bmp"));
     Emulator_KeyboardPressReleaseChar(' ', 6);
-    Emulator_Run(5 * 23);
+    Emulator_Run(5 * 23 + 2);
     Test_CheckScreenshot(_T("data\\test06_09.bmp"));  // Circles
     Emulator_KeyboardPressReleaseChar(' ');
     Emulator_Run(126);
@@ -603,7 +603,7 @@ void Test6_TurboBasic()
     Emulator_Run(260);
     Test_CheckScreenshot(_T("data\\test06_11.bmp"));  // Blocks
     Emulator_KeyboardPressReleaseChar(' ');
-    Emulator_Run(149);
+    Emulator_Run(150);
     Test_CheckScreenshot(_T("data\\test06_12.bmp"));  // Line
     Emulator_KeyboardPressReleaseChar(' ');
     Emulator_Run(75);
@@ -614,10 +614,10 @@ void Test6_TurboBasic()
     Emulator_Run(5 * 9 + 6);
     Test_CheckScreenshot(_T("data\\test06_15.bmp"));  // Pages
     Emulator_KeyboardPressReleaseChar(' ', 6);
-    Emulator_Run(5 * 44);
+    Emulator_Run(5 * 44 - 2);
     Test_CheckScreenshot(_T("data\\test06_16.bmp"));  // Space frogs
     Emulator_KeyboardPressReleaseChar(' ', 6);
-    Emulator_Run(100);
+    Emulator_Run(92);
     Test_CheckScreenshot(_T("data\\test06_17.bmp"));
     //Test_SaveScreenshotSeria(_T("video\\test06_%04u.bmp"), 50, 2);
 
@@ -684,19 +684,19 @@ void Test8_GD()
 
     Emulator_RunAndWaitForCursor(109 * 10);
     Test_CheckScreenshot(_T("data\\test08_01.bmp"));
-    Emulator_RunAndWaitForCursor((203 - 109) * 10);
+    Emulator_RunAndWaitForCursor(920);
     Test_CheckScreenshot(_T("data\\test08_02.bmp"));
-    Emulator_RunAndWaitForCursor((295 - 203) * 10);
+    Emulator_RunAndWaitForCursor(910);
     Test_CheckScreenshot(_T("data\\test08_03.bmp"));
-    Emulator_RunAndWaitForCursor((338 - 295) * 10);
+    Emulator_RunAndWaitForCursor(420);
     Test_CheckScreenshot(_T("data\\test08_04.bmp"));
-    Emulator_RunAndWaitForCursor(895);
+    Emulator_Run(865);
     Test_CheckScreenshot(_T("data\\test08_05.bmp"));
-    Emulator_RunAndWaitForCursor((453 - 428) * 10);
+    Emulator_RunAndWaitForCursor(230);
     Test_CheckScreenshot(_T("data\\test08_06.bmp"));
-    Emulator_RunAndWaitForCursor((501 - 453) * 10);
+    Emulator_RunAndWaitForCursor(480);
     Test_CheckScreenshot(_T("data\\test08_07.bmp"));
-    Emulator_Run((508 - 501) * 10);
+    Emulator_Run(70);
 
     Emulator_KeyboardSequence("EXIT\n");
     Emulator_Run(100);
@@ -707,7 +707,7 @@ void Test8_GD()
     Emulator_KeyboardSequence("ASS LD1 DK\n");
     Emulator_Run(100);
     Emulator_KeyboardSequence("RU TST2\n");
-    Emulator_Run(215);
+    Emulator_RunAndWaitForCursor(215);
     Test_CheckScreenshot(_T("data\\test08_10.bmp"));
     Emulator_KeyboardPressRelease(077);  // @
     Emulator_KeyboardSequence("DEM2\n");
@@ -715,15 +715,15 @@ void Test8_GD()
 
     Emulator_RunAndWaitForCursor(208 * 10);
     Test_CheckScreenshot(_T("data\\test08_11.bmp"));
-    Emulator_RunAndWaitForCursor((283 - 208) * 10);
+    Emulator_RunAndWaitForCursor(75 * 10);
     Test_CheckScreenshot(_T("data\\test08_12.bmp"));
-    Emulator_RunAndWaitForCursor((506 - 283) * 10);
+    Emulator_RunAndWaitForCursor(223 * 10);
     Test_CheckScreenshot(_T("data\\test08_13.bmp"));
-    Emulator_RunAndWaitForCursor((626 - 506) * 10);
+    Emulator_RunAndWaitForCursor(118 * 10);
     Test_CheckScreenshot(_T("data\\test08_14.bmp"));
-    Emulator_RunAndWaitForCursor((987 - 626) * 10);
+    Emulator_RunAndWaitForCursor(359 * 10);
     Test_CheckScreenshot(_T("data\\test08_15.bmp"));
-    Emulator_RunAndWaitForCursor((2126 - 987) * 10);
+    Emulator_RunAndWaitForCursor(1139 * 10);
     Test_CheckScreenshot(_T("data\\test08_16.bmp"));
     //Test_SaveScreenshotSeria(_T("video\\test08_%04u.bmp"), 10, 10);
 
@@ -942,7 +942,7 @@ void Test10_ITO()
     Emulator_KeyboardSequence("1\n");
     Emulator_Run(375);  // Boot and wait for menu
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- "Puckman" selected
-    Emulator_Run(225);
+    Emulator_Run(390);
     Test_CheckScreenshot(_T("data\\test10_14.bmp"));
     Emulator_Run(225);
     Test_CheckScreenshot(_T("data\\test10_15.bmp"));
@@ -1057,7 +1057,7 @@ void Test13_PAFCommander()
     Emulator_KeyboardPressRelease(0153);  // "Enter" -- date
     Emulator_Run(8 * 25);
     Emulator_KeyboardSequence("PC\n");
-    Emulator_Run(12 * 25);
+    Emulator_Run(12 * 25 - 3);
     Test_CheckScreenshot(_T("data\\test13_01.bmp"));
     // Здесь курсор постоянно меняет цвет
 
@@ -1180,11 +1180,11 @@ void Test15_VariousTS()
     Test_CreateDiskImage(_T("temp\\tempdisk.dsk"), 80);
     Test_AttachFloppyImage(0, _T("temp\\tempdisk.dsk"));
     Emulator_KeyboardPressRelease(0153, 10);  // "Enter" -- run the test
-    Emulator_Run(4197);
+    Emulator_Run(3735);  //NOTE: Это время сильно зависит от параметров дисковода, в конце теста очищается экран и выходит в меню
     Test_CheckScreenshot(_T("data\\test15_08b.bmp"));
     Emulator_Run(25);
 
-    //Test_SaveScreenshotSeria(_T("video\\test15_%04u.bmp"), 20, 10);
+    //Test_SaveScreenshotSeria(_T("video\\test15_%04u.bmp"), 30, 5);
 
     //TODO: Остальные тесты
 

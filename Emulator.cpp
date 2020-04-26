@@ -767,6 +767,21 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName, const uint32_t * bits, uint32_t 
     return result;
 }
 
+void Emulator_PrepareDiffScreenshot(const uint32_t * scr1, const uint32_t * scr2, uint32_t * dest)
+{
+    const uint32_t * p1 = scr1;
+    const uint32_t * p2 = scr2;
+    uint32_t * pdest = dest;
+    for (int i = 640 * 288; i > 0; i--)
+    {
+        if (*p1 == *p2)
+            *pdest = *p1;
+        else
+            *pdest = 0x00003f | (*p1 & 0x00ff00) | (*p2 & 0xff0000);
+        p1++;  p2++;  pdest++;
+    }
+}
+
 int Emulator_CheckScreenshot(LPCTSTR sFileName)
 {
     uint32_t * bits = (uint32_t *) ::malloc(640 * 288 * 4);
@@ -775,6 +790,21 @@ int Emulator_CheckScreenshot(LPCTSTR sFileName)
     Emulator_PrepareScreenRGB32(bits, ScreenView_StandardRGBColors);
 
     int result = Emulator_CheckScreenshot(sFileName, bits, tempbits);
+    if (result != 0)
+    {
+        uint32_t * diffbits = (uint32_t *) ::malloc(640 * 288 * 4);
+        Emulator_PrepareDiffScreenshot(bits, tempbits, diffbits);
+
+        // Make diff fike name like "diff" + file name without a path from sFileName
+        TCHAR sDiffFileName[MAX_PATH];
+        const TCHAR * sSubFileName = _tcsrchr(sFileName, _T('\\'));
+        sSubFileName = (sSubFileName == NULL) ? sFileName : sSubFileName + 1;
+        wsprintf(sDiffFileName, _T("diff_%s"), sSubFileName);
+
+        Emulator_SaveScreenshot(sDiffFileName, diffbits);
+
+        ::free(diffbits);
+    }
 
     ::free(tempbits);
     ::free(bits);
