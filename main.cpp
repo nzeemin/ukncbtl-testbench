@@ -499,6 +499,15 @@ void Test5_Disks()
     Emulator_Run(75);
     Test_CheckScreenshot(_T("data\\test05_3.bmp"));
 
+    Emulator_KeyboardPressReleaseCtrl(0056);  // Ctrl+L clear screen
+    Emulator_KeyboardPressReleaseChar('\n');
+    Emulator_Run(25);
+    Emulator_KeyboardSequence("DIR/FIL/BAD\n");
+    Emulator_RunAndWaitForCursor(850);  // ~34 секунды
+    Test_CheckScreenshot(_T("data\\test05_4.bmp"));
+
+    //Test_SaveScreenshotSeria(_T("video\\test05_%04u.bmp"), 40, 10);
+
     Test_Done();
 }
 
