@@ -84,12 +84,12 @@ void Test2_Basic()
 
     Emulator_Run(75);  // Boot: 3 seconds
     Emulator_KeyboardSequence("2\n");  // Select boot from the cartridge
-    Emulator_SetCPUBreakpoint(000000);
+    Emulator_AddCPUBreakpoint(000000);
     Test_Assert(!Emulator_Run(6));
     Test_Assert(g_pBoard->GetCPU()->GetPC() == 000000);
     int nAddrType;
-    Test_Assert(g_pBoard->GetCPUMemoryController()->GetWordView(000000, FALSE, TRUE, &nAddrType) == 0240)
-    Emulator_SetCPUBreakpoint(0177777);
+    Test_Assert(g_pBoard->GetCPUMemoryController()->GetWordView(000000, FALSE, TRUE, &nAddrType) == 0240);
+    Emulator_RemoveCPUBreakpoint(000000);
 
     Emulator_RunAndWaitForCursor(95);  // Boot BASIC
     Test_CheckScreenshot(_T("data\\test02_1.bmp"));
