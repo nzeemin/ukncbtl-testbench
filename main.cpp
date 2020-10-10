@@ -173,6 +173,41 @@ void Test2_Basic()
     Test_CheckScreenshot(_T("data\\test02_rnd2.bmp"));
     //Test_SaveScreenshotSeria(_T("video\\test02_%04u.bmp"), 20, 25);
 
+    Emulator_Reset();
+    Emulator_Run(75);  // Boot: 3 seconds
+    Emulator_KeyboardSequence("2\n");  // Select boot from the cartridge
+    Emulator_Run(100);  // Boot BASIC: 5 seconds
+
+    // 3D letter 'A' - see https://zx-pk.ru/threads/31557-bejsik-na-uknts.html?p=1060194&viewfull=1#post1060194
+    Emulator_KeyboardSequence("NEW\n");
+    Emulator_Run(10);
+    Emulator_KeyboardSequence("10 SCREEN 2\n");
+    Emulator_KeyboardSequence("11 FA=3.333\n");
+    Emulator_KeyboardSequence("20 FOR X=-20 TO 130 STEP 5\n");
+    Emulator_KeyboardSequence("30 FOR Y=0 TO 200\n");
+    Emulator_KeyboardSequence("40 GOSUB 120\n");
+    Emulator_KeyboardSequence("50 NY=Y-X*.5+80\n");
+    Emulator_KeyboardSequence("51 NZ=Z+X*0.6+80\n");
+    Emulator_KeyboardSequence("60 LINE(NY,NZ)-(NY,199),0\n");
+    Emulator_KeyboardSequence("70 IF Y=0 THEN PSET(NY,NZ) ELSE LINE(PY,PZ)-(NY,NZ)\n");
+    Emulator_KeyboardSequence("80 PY=NY\n");
+    Emulator_KeyboardSequence("81 PZ=NZ\n");
+    Emulator_KeyboardSequence("90 NEXT Y\n");
+    Emulator_KeyboardSequence("100 NEXT X\n");
+    Emulator_KeyboardSequence("110 GOTO 110\n");
+    Emulator_KeyboardSequence("120 REM FUNCTION\n");
+    Emulator_KeyboardSequence("130 Z=Y*.1\n");
+    Emulator_KeyboardSequence("131 XT=X*.1\n");
+    Emulator_KeyboardSequence("132 YT=(Y+120)*.06\n");
+    Emulator_KeyboardSequence("140 IF XT<0 OR XT>10 THEN RETURN\n");
+    Emulator_KeyboardSequence("150 IF XT<-FA*(YT-10)+10 OR XT<FA*(YT-10)-16.66666 THEN RETURN\n");
+    Emulator_KeyboardSequence("160 IF XT<-FA*(YT-10)+16.66666 OR XT<FA*(YT-10)-10 OR (XT>6 AND XT<8) THEN Z=-20\n");
+    Emulator_KeyboardSequence("170 RETURN\n");
+    Emulator_KeyboardSequence("RUN\n");
+    Emulator_Run(4700);
+    Test_CheckScreenshot(_T("data\\test02_letterA.bmp"));
+    //Test_SaveScreenshotSeria(_T("video\\test02_%04u.bmp"), 15, 100);
+
     Test_Done();
 }
 
